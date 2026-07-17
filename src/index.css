@@ -1,0 +1,222 @@
+@import "tailwindcss";
+
+@theme {
+  /* Warm ink colors — violet-tinted, not cold slate */
+  --color-ink: #2D2B3D;
+  --color-ink-soft: #5B5876;
+  --color-ink-muted: #A8A4BE;
+  --color-line: #E8E4F0;
+  --color-line-soft: #F4F0FA;
+  --color-surface: #FFFFFF;
+  --color-canvas: #F5F0FF;
+
+  --color-blue: #7C3AED;
+  --color-blue-hover: #6D28D9;
+  --color-blue-soft: #EDE9FE;
+  --color-blue-ring: rgba(124, 58, 237, 0.15);
+
+  --color-pink: #EC4899;
+  --color-pink-hover: #DB2777;
+  --color-pink-soft: #FCE7F3;
+  --color-pink-ring: rgba(236, 72, 153, 0.15);
+
+  --color-leaf: #34D399;
+  --color-leaf-soft: #ECFDF5;
+
+  --color-peach: #FB923C;
+  --color-peach-soft: #FFF7ED;
+
+  --color-lavender: #C4B5FD;
+  --color-lavender-soft: #F5F3FF;
+
+  --color-rose-soft: #FFF1F2;
+}
+
+:root {
+  --fs-base: 18px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--fs-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(135deg, #F5F0FF 0%, #FDF2F8 40%, #FFF7ED 70%, #F5F3FF 100%);
+  color: #2D2B3D;
+}
+
+/* ---- Ambient background — warm, visible, dewy glows ---- */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ambient-bg::before,
+.ambient-bg::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(140px);
+}
+.ambient-bg::before {
+  width: 700px;
+  height: 700px;
+  top: -220px;
+  right: -180px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.14), transparent 65%);
+}
+.ambient-bg::after {
+  width: 600px;
+  height: 600px;
+  bottom: -180px;
+  left: -120px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.12), transparent 65%);
+}
+
+/* ---- Warm shadow classes ---- */
+.shadow-warm {
+  box-shadow: 0 2px 24px rgba(168, 85, 247, 0.06), 0 1px 6px rgba(236, 72, 153, 0.04);
+}
+.shadow-warm-hover {
+  box-shadow: 0 4px 28px rgba(168, 85, 247, 0.10), 0 2px 8px rgba(236, 72, 153, 0.06);
+}
+.shadow-warm-lg {
+  box-shadow: 0 8px 40px rgba(168, 85, 247, 0.10), 0 4px 16px rgba(236, 72, 153, 0.07);
+}
+.shadow-warm-xl {
+  box-shadow: 0 12px 48px rgba(168, 85, 247, 0.14), 0 6px 24px rgba(236, 72, 153, 0.08);
+}
+
+/* ---- Dewy highlight — subtle glossy top edge ---- */
+.dew-highlight {
+  position: relative;
+}
+.dew-highlight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  border-radius: 1px;
+}
+
+/* ---- Scrollbar — warm ---- */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #C4B5FD;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A78BFA;
+}
+
+/* ---- Animations ---- */
+@keyframes check-pop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+.check-icon {
+  animation: check-pop 0.22s ease-out;
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slide-left {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim-slide-up { animation: slide-up 0.24s ease-out; }
+.anim-scale-in { animation: scale-in 0.22s ease-out; }
+.anim-fade-in { animation: fade-in 0.22s ease-out; }
+.anim-slide-left { animation: slide-left 0.24s ease-out; }
+.anim-slide-down { animation: slide-down 0.2s ease-out; }
+
+/* ---- Selection — warm violet ---- */
+::selection {
+  background: rgba(124, 58, 237, 0.15);
+}
+
+/* ---- Date input styling — warm ---- */
+input[type="date"] {
+  font-family: inherit;
+  cursor: pointer;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.5;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 0.8;
+}
+
+/* ---- Range slider — warm gradient ---- */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #EDE9FE, #FCE7F3);
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C3AED, #EC4899);
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C3AED, #EC4899);
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
+}
