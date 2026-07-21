@@ -33,7 +33,15 @@ function renderTree(task: Task, depth: number, allTasks: Task[], onEdit: (id: st
 export default function QuadrantView({ onEdit }: QuadrantViewProps) {
   const tasks = useTaskStore((s) => s.tasks);
   const cycleStatus = useTaskStore((s) => s.cycleStatus);
+  const updateTask = useTaskStore((s) => s.updateTask);
   const showCompleted = useSettingsStore((s) => s.showCompleted);
+
+  const QUADRANT_VALUES: Record<Quadrant, { urgency: Task['urgency']; importance: Task['importance'] }> = {
+    do: { urgency: 'high', importance: 'high' },
+    schedule: { urgency: 'low', importance: 'high' },
+    delegate: { urgency: 'high', importance: 'low' },
+    eliminate: { urgency: 'low', importance: 'low' },
+  };
 
   // Filter: non-trashed, optionally hide done
   const visibleTasks = tasks.filter((t) => !t.isTrashed && (showCompleted || t.status !== 'done'));
@@ -73,7 +81,14 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
           const items = grouped[q];
 
           return (
-            <div key={q} className={`${config.bg} ${config.border} border rounded-[16px] flex flex-col overflow-hidden min-h-0 dew-highlight shadow-warm`}>
+            <div key={q}
+              className={`${config.bg} ${config.border} border rounded-[16px] flex flex-col overflow-hidden min-h-0 dew-highlight shadow-warm`}
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              onDrop={(e) => {
+                e.preventDefault(); e.stopPropagation();
+                const taskId = e.dataTransfer.getData('task/id');
+                if (taskId) { const vals = QUADRANT_VALUES[q]; updateTask(taskId, vals); }
+              }}>
               <div className={`${config.headerBg} px-4 py-3 border-b ${config.border} shrink-0`}>
                 <div className="flex items-center justify-between">
                   <h4 className={`text-sm font-bold ${config.headerText}`}>{config.label}</h4>

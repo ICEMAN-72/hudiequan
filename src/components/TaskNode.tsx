@@ -17,6 +17,8 @@ interface TaskNodeProps {
   depth: number;
   allTasks: Task[];
   onEdit: (id: string) => void;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
 }
 
 /** Status circle — click to cycle: todo → in_progress → done */
@@ -72,7 +74,7 @@ function sortChildren(children: Task[]): Task[] {
   });
 }
 
-export default function TaskNode({ task, depth, allTasks, onEdit }: TaskNodeProps) {
+export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, onToggleSelect }: TaskNodeProps) {
   const cycleStatus = useTaskStore((s) => s.cycleStatus);
   const deleteTask = useTaskStore((s) => s.deleteTask);
   const restoreTask = useTaskStore((s) => s.restoreTask);
@@ -84,6 +86,9 @@ export default function TaskNode({ task, depth, allTasks, onEdit }: TaskNodeProp
   const [dragOver, setDragOver] = useState(false);
   const [showSubInput, setShowSubInput] = useState(false);
   const [subTitle, setSubTitle] = useState('');
+  const [showNotes, setShowNotes] = useState(false);
+
+  const isSelected = selectedIds?.has(task.id) ?? false;
 
   const children = allTasks.filter((t) => t.parentId === task.id && !t.isTrashed);
   const quadrant = task.parentId ? getEffectiveQuadrant(task, allTasks) : getQuadrant(task);
@@ -119,9 +124,17 @@ export default function TaskNode({ task, depth, allTasks, onEdit }: TaskNodeProp
         onDrop={handleDrop}
         className={`group flex items-center gap-3 px-5 py-4 bg-white/80 rounded-[16px] transition-all duration-200 cursor-grab active:cursor-grabbing dew-highlight ${
           dragOver ? 'ring-2 ring-violet-300 ring-offset-2 shadow-warm-hover' : 'shadow-warm hover:shadow-warm-hover'
-        } ${isDone || isTrash ? 'opacity-45' : ''}`}
+        } ${isDone || isTrash ? 'opacity-45' : ''} ${isSelected ? 'ring-2 ring-violet-400 bg-violet-50/30' : ''}`}
         style={{ marginLeft: indentPx }}
       >
+        {/* Batch select checkbox */}
+        {onToggleSelect && !isTrash && (
+          <button onClick={(e) => { e.stopPropagation(); onToggleSelect(task.id); }}
+            className={`w-[1.1rem] h-[1.1rem] rounded border-2 shrink-0 transition-colors ${isSelected ? 'bg-violet-500 border-violet-500' : 'border-violet-200 hover:border-violet-400'}`}>
+            {isSelected && <svg className="w-full h-full text-white p-[2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+          </button>
+        )}
+
         {/* Drag handle */}
         {!isTrash && (
           <svg className="w-[1rem] h-[1rem] text-violet-200 group-hover:text-violet-400 shrink-0 transition-colors" viewBox="0 0 24 24" fill="currentColor">
@@ -159,6 +172,24 @@ export default function TaskNode({ task, depth, allTasks, onEdit }: TaskNodeProp
         </div>
 
         <DateBadge task={task} />
+
+        {/* Recurrence badge */}
+        {task.recurrence && task.recurrence !== 'none' && (
+          <span className="text-xs px-1.5 py-0.5 rounded-full bg-teal-50 text-teal-600 font-medium shrink-0" title="周期任务">
+            🔄
+          </span>
+        )}
+
+        {/* Notes icon */}
+        {task.notes && (
+          <button onClick={(e) => { e.stopPropagation(); setShowNotes(!showNotes); }}
+            className={`w-6 h-6 flex items-center justify-center rounded-full shrink-0 ${showNotes ? 'bg-violet-50 text-violet-600' : 'text-violet-300 hover:text-violet-500'}`}
+            title="查看备注">
+            <svg className="w-[0.85rem] h-[0.85rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+            </svg>
+          </button>
+        )}
 
         {children.length > 0 && (
           <span className="text-xs text-violet-400 font-medium tabular-nums shrink-0">
@@ -209,6 +240,14 @@ export default function TaskNode({ task, depth, allTasks, onEdit }: TaskNodeProp
 
       {dragOver && <div className="text-xs text-violet-500 font-medium py-2 anim-fade-in" style={{ marginLeft: indentPx + 32 }}>↳ 拖入此处作为子任务</div>}
 
+      {/* Notes expanded */}
+      {showNotes && task.notes && (
+        <div className="mt-2 py-3 px-5 mx-5 rounded-[14px] bg-violet-50/30 border border-violet-100/30 anim-slide-up text-xs text-violet-600 leading-relaxed whitespace-pre-wrap"
+          style={{ marginLeft: indentPx + 28 }}>
+          {task.notes}
+        </div>
+      )}
+
       {showSubInput && (
         <div className="py-2 anim-slide-up" style={{ marginLeft: (depth + 1) * 28 }}>
           <div className="flex items-center gap-3 px-5 py-3.5 bg-white/80 rounded-[16px] shadow-warm border-2 border-violet-200/40">
@@ -224,7 +263,7 @@ export default function TaskNode({ task, depth, allTasks, onEdit }: TaskNodeProp
       {expanded && children.length > 0 && (
         <div className="mt-3 space-y-3">
           {sortChildren(children).map((child) => (
-            <TaskNode key={child.id} task={child} depth={depth + 1} allTasks={allTasks} onEdit={onEdit} />
+            <TaskNode key={child.id} task={child} depth={depth + 1} allTasks={allTasks} onEdit={onEdit} selectedIds={selectedIds} onToggleSelect={onToggleSelect} />
           ))}
         </div>
       )}

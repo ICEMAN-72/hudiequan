@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTaskStore } from '../store/taskStore';
-import type { Quadrant, DateType, Task } from '../types';
+import type { Quadrant, DateType, Task, RecurrenceType } from '../types';
 import { QUADRANT_CONFIG } from '../types';
 
 interface NewTaskFormProps {
@@ -33,6 +33,13 @@ const DATE_OPTIONS: { value: DateType; label: string; icon: string }[] = [
   { value: 'range', label: '时间段', icon: '◇' },
 ];
 
+const RECURRENCE_OPTIONS: { value: RecurrenceType; label: string }[] = [
+  { value: 'none', label: '不重复' },
+  { value: 'daily', label: '每天' },
+  { value: 'weekly', label: '每周' },
+  { value: 'monthly', label: '每月' },
+];
+
 const QUADRANT_ICONS: Record<Quadrant, string> = {
   do: '🔥',
   schedule: '📅',
@@ -61,6 +68,8 @@ export default function NewTaskForm({ editingTaskId, onDone }: NewTaskFormProps)
   const [dateType, setDateType] = useState<DateType>('none');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [notes, setNotes] = useState('');
+  const [recurrence, setRecurrence] = useState<RecurrenceType>('none');
 
   useEffect(() => {
     if (editingTask) {
@@ -69,12 +78,16 @@ export default function NewTaskForm({ editingTaskId, onDone }: NewTaskFormProps)
       setDateType(editingTask.dateType ?? 'none');
       setStartDate(editingTask.startDate ?? '');
       setEndDate(editingTask.endDate ?? '');
+      setNotes(editingTask.notes ?? '');
+      setRecurrence(editingTask.recurrence ?? 'none');
     } else {
       setTitle('');
       setSelectedQuadrant('do');
       setDateType('none');
       setStartDate('');
       setEndDate('');
+      setNotes('');
+      setRecurrence('none');
     }
   }, [editingTask]);
 
@@ -91,15 +104,19 @@ export default function NewTaskForm({ editingTaskId, onDone }: NewTaskFormProps)
         dateType,
         startDate: dateType !== 'none' ? startDate : undefined,
         endDate: dateType === 'range' ? endDate : undefined,
+        notes: notes.trim() || undefined,
+        recurrence: recurrence !== 'none' ? recurrence : undefined,
       });
     } else {
-      addTask(title.trim(), urgency, importance, dateType, startDate, endDate);
+      addTask(title.trim(), urgency, importance, dateType, startDate, endDate, notes.trim() || undefined, recurrence);
     }
     setTitle('');
     setSelectedQuadrant('do');
     setDateType('none');
     setStartDate('');
     setEndDate('');
+    setNotes('');
+    setRecurrence('none');
     onDone();
   }, [title, selectedQuadrant, dateType, startDate, endDate, editingTaskId, addTask, updateTask, onDone]);
 
@@ -150,6 +167,15 @@ export default function NewTaskForm({ editingTaskId, onDone }: NewTaskFormProps)
           placeholder="输入任务名称…"
           className="w-full px-5 py-4 rounded-[16px] bg-violet-50/30 border-2 border-transparent focus:border-violet-300 focus:bg-white focus:ring-[4px] focus:ring-violet-50 outline-none transition-all text-base text-violet-900 placeholder:text-violet-200"
           autoFocus
+        />
+
+        {/* Notes — simple textarea */}
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="备注（可选）…"
+          rows={2}
+          className="w-full px-5 py-3 rounded-[16px] bg-violet-50/20 border-2 border-transparent focus:border-violet-200 focus:bg-white focus:ring-[4px] focus:ring-violet-50 outline-none transition-all text-sm text-violet-800 placeholder:text-violet-200 resize-none"
         />
 
         {/* Quadrant card — distinct purple tint background */}
@@ -274,6 +300,21 @@ export default function NewTaskForm({ editingTaskId, onDone }: NewTaskFormProps)
               </p>
             </div>
           )}
+
+          {/* Recurrence selector */}
+          <div className="mt-4 pt-4 border-t border-pink-100/30">
+            <div className="flex items-center gap-2.5 mb-3 px-1">
+              <span className="text-xs text-violet-400">周期重复</span>
+            </div>
+            <div className="flex gap-2">
+              {RECURRENCE_OPTIONS.map((opt) => (
+                <button key={opt.value} onClick={() => setRecurrence(opt.value)}
+                  className={`flex-1 px-2 py-2.5 rounded-full text-xs font-bold transition-all ${recurrence === opt.value ? 'bg-violet-700 text-white' : 'bg-white/70 text-violet-500 hover:bg-white'}`}>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Sub-task management — only when editing */}

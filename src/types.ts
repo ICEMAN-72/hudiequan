@@ -10,12 +10,16 @@ export interface Task {
   endDate?: string;
   createdAt: number;
   isTrashed?: boolean;
+  notes?: string;
+  recurrence?: 'none' | 'daily' | 'weekly' | 'monthly';
+  recurrenceId?: string;
 }
 
 export type Quadrant = 'do' | 'schedule' | 'delegate' | 'eliminate';
 export type TaskStatus = 'todo' | 'in_progress' | 'done';
 export type DateType = 'none' | 'point' | 'range';
 export type SortOption = 'default' | 'status' | 'created' | 'children';
+export type RecurrenceType = 'none' | 'daily' | 'weekly' | 'monthly';
 
 export function getQuadrant(task: Task): Quadrant {
   if (task.urgency === 'high' && task.importance === 'high') return 'do';

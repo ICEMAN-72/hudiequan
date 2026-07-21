@@ -11,6 +11,8 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
   const setFontSize = useSettingsStore((s) => s.setFontSize);
   const showCompleted = useSettingsStore((s) => s.showCompleted);
   const setShowCompleted = useSettingsStore((s) => s.setShowCompleted);
+  const darkMode = useSettingsStore((s) => s.darkMode);
+  const setDarkMode = useSettingsStore((s) => s.setDarkMode);
   const tasks = useTaskStore((s) => s.tasks);
   const setTasks = useTaskStore((s) => s.setTasks);
 
@@ -119,6 +121,20 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
               <span>默认 18</span>
               <span>大 26</span>
             </div>
+          </div>
+
+          {/* Dark mode */}
+          <div className="bg-white/70 rounded-[16px] p-5 flex items-center justify-between gap-4 mb-4">
+            <div>
+              <span className="text-sm font-semibold text-violet-700">深色模式</span>
+              <p className="text-xs text-violet-300 mt-1.5">切换到深色主题</p>
+            </div>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`relative w-[3.2rem] h-[1.7rem] rounded-full transition-colors duration-200 shrink-0 shadow-warm ${darkMode ? 'bg-violet-500' : 'bg-violet-200'}`}
+            >
+              <span className={`absolute top-[2.5px] w-[1.25rem] h-[1.25rem] rounded-full bg-white shadow-sm transition-all duration-200 ${darkMode ? 'left-[1.7rem]' : 'left-[3px]'}`} />
+            </button>
           </div>
 
           {/* Show completed */}

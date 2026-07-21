@@ -8,6 +8,8 @@ interface TaskListProps {
   onEdit: (id: string) => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
+  selectedIds: Set<string>;
+  onToggleSelect: (id: string) => void;
 }
 
 const SORT_LABELS: Record<SortOption, string> = {
@@ -48,7 +50,7 @@ function matchesQuery(task: Task, query: string, allTasks: Task[]): boolean {
   return children.some((c) => c.title.toLowerCase().includes(q));
 }
 
-export default function TaskList({ onEdit, searchQuery, onSearchChange }: TaskListProps) {
+export default function TaskList({ onEdit, searchQuery, onSearchChange, selectedIds, onToggleSelect }: TaskListProps) {
   const tasks = useTaskStore((s) => s.tasks);
   const sortBy = useTaskStore((s) => s.sortBy);
   const setSortBy = useTaskStore((s) => s.setSortBy);
@@ -98,6 +100,16 @@ export default function TaskList({ onEdit, searchQuery, onSearchChange }: TaskLi
 
   return (
     <div className="anim-slide-up h-full flex flex-col">
+      {/* Section label */}
+      <div className="flex items-center gap-2.5 mb-3.5 px-1 shrink-0">
+        <svg className="w-[1rem] h-[1rem] text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+        </svg>
+        <h3 className="text-sm font-bold text-violet-800">任务列表</h3>
+        <div className="h-[0.9rem] w-px bg-violet-100/40" />
+        <span className="text-xs text-violet-300 font-medium">拖拽任务可嵌套为子任务</span>
+      </div>
+
       {/* Stats + Search — taller row */}
       <div className="flex items-center justify-between mb-4 px-1 shrink-0 gap-4" style={{ minHeight: '2.5rem' }}>
         {/* Stats */}
@@ -160,7 +172,7 @@ export default function TaskList({ onEdit, searchQuery, onSearchChange }: TaskLi
         onDrop={handleRootDrop}
       >
         {filteredRoots.map((task) => (
-          <TaskNode key={task.id} task={task} depth={0} allTasks={activeTasks} onEdit={onEdit} />
+          <TaskNode key={task.id} task={task} depth={0} allTasks={activeTasks} onEdit={onEdit} selectedIds={selectedIds} onToggleSelect={onToggleSelect} />
         ))}
         {filteredRoots.length === 0 && searchQuery && (
           <p className="text-sm text-violet-200 text-center py-12">没有找到匹配的任务</p>

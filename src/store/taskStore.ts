@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Task, DateType, SortOption } from '../types';
+import type { Task, DateType, SortOption, RecurrenceType } from '../types';
 import { getDescendantIds, isDescendantOf, NEXT_STATUS } from '../types';
 
 interface TaskState {
@@ -12,11 +12,12 @@ interface TaskState {
     importance: Task['importance'],
     dateType?: DateType,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    notes?: string,
+    recurrence?: RecurrenceType
   ) => void;
   addSubTask: (parentId: string, title: string) => void;
-  addTasksFromClipboard: (lines: string[], urgency: Task['urgency'], importance: Task['importance']) => void;
-  updateTask: (id: string, updates: Partial<Pick<Task, 'title' | 'urgency' | 'importance' | 'status' | 'dateType' | 'startDate' | 'endDate'>>) => void;
+  updateTask: (id: string, updates: Partial<Pick<Task, 'title' | 'urgency' | 'importance' | 'status' | 'dateType' | 'startDate' | 'endDate' | 'notes' | 'recurrence'>>) => void;
   deleteTask: (id: string) => void;
   restoreTask: (id: string) => void;
   permanentlyDelete: (id: string) => void;
@@ -24,6 +25,9 @@ interface TaskState {
   cycleStatus: (id: string) => void;
   setTasks: (tasks: Task[]) => void;
   setSortBy: (sort: SortOption) => void;
+  batchDelete: (ids: string[]) => void;
+  batchComplete: (ids: string[]) => void;
+  batchMoveQuadrant: (ids: string[], urgency: Task['urgency'], importance: Task['importance']) => void;
 }
 
 export const useTaskStore = create<TaskState>()(
@@ -32,7 +36,7 @@ export const useTaskStore = create<TaskState>()(
       tasks: [],
       sortBy: 'default' as SortOption,
 
-      addTask: (title, urgency, importance, dateType = 'none', startDate, endDate) => {
+      addTask: (title, urgency, importance, dateType = 'none', startDate, endDate, notes, recurrence = 'none') => {
         const task: Task = {
           id: crypto.randomUUID(),
           title,
@@ -42,6 +46,8 @@ export const useTaskStore = create<TaskState>()(
           dateType,
           startDate: dateType !== 'none' ? startDate : undefined,
           endDate: dateType === 'range' ? endDate : undefined,
+          notes: notes?.trim() || undefined,
+          recurrence: recurrence !== 'none' ? recurrence : undefined,
           createdAt: Date.now(),
         };
         set((state) => ({ tasks: [task, ...state.tasks] }));
@@ -60,19 +66,6 @@ export const useTaskStore = create<TaskState>()(
           createdAt: Date.now(),
         };
         set((state) => ({ tasks: [...state.tasks, task] }));
-      },
-
-      addTasksFromClipboard: (lines, urgency, importance) => {
-        const newTasks: Task[] = lines.map((line) => ({
-          id: crypto.randomUUID(),
-          title: line,
-          urgency,
-          importance,
-          status: 'todo' as const,
-          dateType: 'none' as DateType,
-          createdAt: Date.now(),
-        }));
-        set((state) => ({ tasks: [...newTasks, ...state.tasks] }));
       },
 
       updateTask: (id, updates) => {
@@ -112,19 +105,65 @@ export const useTaskStore = create<TaskState>()(
       },
 
       cycleStatus: (id) => {
+        const task = get().tasks.find((t) => t.id === id);
+        const nextStatus = task ? NEXT_STATUS[task.status] : 'todo';
         set((state) => ({
           tasks: state.tasks.map((t) =>
-            t.id === id ? { ...t, status: NEXT_STATUS[t.status] } : t
+            t.id === id ? { ...t, status: nextStatus } : t
           ),
         }));
+        // If completing a recurring task, create next instance
+        if (task && nextStatus === 'done' && task.recurrence && task.recurrence !== 'none' && !task.recurrenceId) {
+          let nextStart: string | undefined;
+          if (task.startDate) {
+            const d = new Date(task.startDate);
+            if (task.recurrence === 'daily') d.setDate(d.getDate() + 1);
+            else if (task.recurrence === 'weekly') d.setDate(d.getDate() + 7);
+            else if (task.recurrence === 'monthly') d.setMonth(d.getMonth() + 1);
+            nextStart = d.toISOString().slice(0, 10);
+          }
+          let nextEnd: string | undefined;
+          if (nextStart && task.startDate && task.endDate) {
+            const diff = new Date(task.endDate).getTime() - new Date(task.startDate).getTime();
+            nextEnd = new Date(new Date(nextStart).getTime() + diff).toISOString().slice(0, 10);
+          }
+          const next: Task = {
+            id: crypto.randomUUID(),
+            title: task.title,
+            urgency: task.urgency,
+            importance: task.importance,
+            status: 'todo' as const,
+            dateType: task.dateType,
+            startDate: nextStart,
+            endDate: nextEnd,
+            notes: task.notes,
+            recurrence: task.recurrence,
+            recurrenceId: task.recurrenceId || task.id,
+            createdAt: Date.now(),
+          };
+          set((state) => ({ tasks: [...state.tasks, next] }));
+        }
       },
 
       setTasks: (tasks) => set({ tasks }),
       setSortBy: (sort) => set({ sortBy: sort }),
+
+      batchDelete: (ids) => {
+        const idSet = new Set(ids);
+        set((state) => ({ tasks: state.tasks.map((t) => idSet.has(t.id) ? { ...t, isTrashed: true } : t) }));
+      },
+      batchComplete: (ids) => {
+        const idSet = new Set(ids);
+        set((state) => ({ tasks: state.tasks.map((t) => idSet.has(t.id) ? { ...t, status: 'done' as const } : t) }));
+      },
+      batchMoveQuadrant: (ids, urgency, importance) => {
+        const idSet = new Set(ids);
+        set((state) => ({ tasks: state.tasks.map((t) => idSet.has(t.id) ? { ...t, urgency, importance } : t) }));
+      },
     }),
     {
       name: 'hudiequan-tasks',
-      version: 3,
+      version: 4,
       migrate: (persistedState: unknown, version: number) => {
         if (version < 2) {
           const state = persistedState as { tasks: unknown[] };
@@ -150,6 +189,11 @@ export const useTaskStore = create<TaskState>()(
           const state = persistedState as { tasks: unknown[] };
           const migrated = (state.tasks as Task[]).map((t) => ({ ...t, isTrashed: false }));
           return { tasks: migrated, sortBy: 'default' as SortOption };
+        }
+        if (version < 4) {
+          const state = persistedState as { tasks: unknown[] };
+          const migrated = (state.tasks as Task[]).map((t) => ({ ...t, notes: undefined, recurrence: undefined }));
+          return { tasks: migrated, sortBy: (state as TaskState).sortBy || 'default' as SortOption };
         }
         return persistedState as TaskState;
       },
