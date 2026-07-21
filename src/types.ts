@@ -6,14 +6,16 @@ export interface Task {
   status: 'todo' | 'in_progress' | 'done';
   parentId?: string;
   dateType?: 'none' | 'point' | 'range';
-  startDate?: string; // ISO date 'YYYY-MM-DD'
-  endDate?: string;   // ISO date 'YYYY-MM-DD'
+  startDate?: string;
+  endDate?: string;
   createdAt: number;
+  isTrashed?: boolean;
 }
 
 export type Quadrant = 'do' | 'schedule' | 'delegate' | 'eliminate';
 export type TaskStatus = 'todo' | 'in_progress' | 'done';
 export type DateType = 'none' | 'point' | 'range';
+export type SortOption = 'default' | 'status' | 'created' | 'children';
 
 export function getQuadrant(task: Task): Quadrant {
   if (task.urgency === 'high' && task.importance === 'high') return 'do';

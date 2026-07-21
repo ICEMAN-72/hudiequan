@@ -25,7 +25,7 @@ export default function Calendar() {
   const month = currentDate.getMonth();
 
   const datedTasks = useMemo(
-    () => tasks.filter((t) => !t.parentId && t.dateType && t.dateType !== 'none' && t.startDate && (showCompleted || t.status !== 'done')),
+    () => tasks.filter((t) => !t.isTrashed && !t.parentId && t.dateType && t.dateType !== 'none' && t.startDate && (showCompleted || t.status !== 'done')),
     [tasks, showCompleted]
   );
 

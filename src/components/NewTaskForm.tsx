@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTaskStore } from '../store/taskStore';
-import type { Quadrant, DateType } from '../types';
+import type { Quadrant, DateType, Task } from '../types';
 import { QUADRANT_CONFIG } from '../types';
 
 interface NewTaskFormProps {
@@ -44,8 +44,17 @@ export default function NewTaskForm({ editingTaskId, onDone }: NewTaskFormProps)
   const tasks = useTaskStore((s) => s.tasks);
   const addTask = useTaskStore((s) => s.addTask);
   const updateTask = useTaskStore((s) => s.updateTask);
+  const addSubTask = useTaskStore((s) => s.addSubTask);
+  const cycleStatus = useTaskStore((s) => s.cycleStatus);
+  const deleteTask = useTaskStore((s) => s.deleteTask);
 
   const editingTask = editingTaskId ? tasks.find((t) => t.id === editingTaskId) : null;
+  const children = editingTaskId ? tasks.filter((t) => t.parentId === editingTaskId && !t.isTrashed) : [];
+  const sortedChildren = [...children].sort((a, b) => {
+    const order: Record<Task['status'], number> = { in_progress: 0, todo: 1, done: 2 };
+    if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+    return b.createdAt - a.createdAt;
+  });
 
   const [title, setTitle] = useState('');
   const [selectedQuadrant, setSelectedQuadrant] = useState<Quadrant>('do');
@@ -266,6 +275,62 @@ export default function NewTaskForm({ editingTaskId, onDone }: NewTaskFormProps)
             </div>
           )}
         </div>
+
+        {/* Sub-task management — only when editing */}
+        {editingTaskId && (
+          <div className="rounded-[20px] p-5" style={{ background: 'linear-gradient(135deg, rgba(237, 233, 254, 0.6) 0%, rgba(224, 231, 255, 0.4) 100%)', border: '1.5px solid rgba(165, 180, 252, 0.3)' }}>
+            <div className="flex items-center justify-between mb-4 px-1">
+              <div className="flex items-center gap-2.5">
+                <span className="text-lg">📋</span>
+                <div>
+                  <p className="text-sm font-bold text-violet-800">子任务管理</p>
+                  <p className="text-xs text-violet-400">{children.length} 个子任务</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  addSubTask(editingTaskId, '新子任务');
+                }}
+                className="px-3 py-1.5 rounded-full text-xs font-bold text-violet-600 bg-white/70 hover:bg-white transition-colors"
+              >
+                + 添加
+              </button>
+            </div>
+            {children.length === 0 ? (
+              <div className="rounded-[14px] bg-white/70 px-4 py-4 text-center">
+                <p className="text-xs text-violet-300">暂无子任务</p>
+              </div>
+            ) : (
+              <div className="space-y-1.5 max-h-[14rem] overflow-y-auto">
+                {sortedChildren.map((child) => (
+                  <div key={child.id} className="flex items-center gap-3 px-4 py-2.5 bg-white/70 rounded-[12px] group">
+                    <button onClick={() => cycleStatus(child.id)}
+                      className="relative w-[1rem] h-[1rem] rounded-full shrink-0 transition-all duration-200 active:scale-90"
+                      style={child.status === 'todo' ? { border: '2px solid #C4B5FD', background: 'transparent' }
+                        : child.status === 'in_progress' ? { border: '2px solid #7C3AED', background: '#EDE9FE', boxShadow: '0 0 4px rgba(124, 58, 237, 0.15)' }
+                        : { border: '2px solid #EC4899', background: '#EC4899', boxShadow: '0 0 4px rgba(236, 72, 153, 0.2)' }
+                      }>
+                      {child.status === 'done' && (
+                        <svg className="absolute inset-0 m-auto w-[0.55rem] h-[0.55rem] text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                    <span className={`flex-1 text-sm truncate ${child.status === 'done' ? 'line-through text-violet-300' : 'text-violet-800'}`}>
+                      {child.title}
+                    </span>
+                    <button onClick={() => deleteTask(child.id)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-violet-300 hover:text-red-400 shrink-0">
+                      <svg className="w-[0.9rem] h-[0.9rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Spacer */}
         <div className="min-h-[1rem]" />

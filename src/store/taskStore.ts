@@ -1,10 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Task, DateType } from '../types';
+import type { Task, DateType, SortOption } from '../types';
 import { getDescendantIds, isDescendantOf, NEXT_STATUS } from '../types';
 
 interface TaskState {
   tasks: Task[];
+  sortBy: SortOption;
   addTask: (
     title: string,
     urgency: Task['urgency'],
@@ -17,15 +18,19 @@ interface TaskState {
   addTasksFromClipboard: (lines: string[], urgency: Task['urgency'], importance: Task['importance']) => void;
   updateTask: (id: string, updates: Partial<Pick<Task, 'title' | 'urgency' | 'importance' | 'status' | 'dateType' | 'startDate' | 'endDate'>>) => void;
   deleteTask: (id: string) => void;
+  restoreTask: (id: string) => void;
+  permanentlyDelete: (id: string) => void;
   moveTask: (id: string, newParentId: string | undefined) => void;
   cycleStatus: (id: string) => void;
   setTasks: (tasks: Task[]) => void;
+  setSortBy: (sort: SortOption) => void;
 }
 
 export const useTaskStore = create<TaskState>()(
   persist(
     (set, get) => ({
       tasks: [],
+      sortBy: 'default' as SortOption,
 
       addTask: (title, urgency, importance, dateType = 'none', startDate, endDate) => {
         const task: Task = {
@@ -79,6 +84,20 @@ export const useTaskStore = create<TaskState>()(
       },
 
       deleteTask: (id) => {
+        const idsToTrash = new Set([id, ...getDescendantIds(id, get().tasks)]);
+        set((state) => ({ tasks: state.tasks.map((t) =>
+          idsToTrash.has(t.id) ? { ...t, isTrashed: true } : t
+        ) }));
+      },
+
+      restoreTask: (id) => {
+        const idsToRestore = new Set([id, ...getDescendantIds(id, get().tasks)]);
+        set((state) => ({ tasks: state.tasks.map((t) =>
+          idsToRestore.has(t.id) ? { ...t, isTrashed: false } : t
+        ) }));
+      },
+
+      permanentlyDelete: (id) => {
         const idsToDelete = new Set([id, ...getDescendantIds(id, get().tasks)]);
         set((state) => ({ tasks: state.tasks.filter((t) => !idsToDelete.has(t.id)) }));
       },
@@ -101,10 +120,11 @@ export const useTaskStore = create<TaskState>()(
       },
 
       setTasks: (tasks) => set({ tasks }),
+      setSortBy: (sort) => set({ sortBy: sort }),
     }),
     {
       name: 'hudiequan-tasks',
-      version: 2,
+      version: 3,
       migrate: (persistedState: unknown, version: number) => {
         if (version < 2) {
           const state = persistedState as { tasks: unknown[] };
@@ -121,9 +141,15 @@ export const useTaskStore = create<TaskState>()(
               startDate: undefined,
               endDate: undefined,
               createdAt: old.createdAt as number,
+              isTrashed: false,
             };
           }) as Task[];
-          return { tasks: migrated };
+          return { tasks: migrated, sortBy: 'default' as SortOption };
+        }
+        if (version < 3) {
+          const state = persistedState as { tasks: unknown[] };
+          const migrated = (state.tasks as Task[]).map((t) => ({ ...t, isTrashed: false }));
+          return { tasks: migrated, sortBy: 'default' as SortOption };
         }
         return persistedState as TaskState;
       },

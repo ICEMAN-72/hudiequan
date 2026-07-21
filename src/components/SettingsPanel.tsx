@@ -32,11 +32,34 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
     setShowClearConfirm(false);
   };
 
+  const importData = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result as string);
+          if (data.tasks && Array.isArray(data.tasks)) {
+            setTasks(data.tasks as typeof tasks);
+          }
+        } catch { /* ignore invalid files */ }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
   return (
-    <div className="fixed inset-0 z-50" onClick={onClose}>
-      {/* Panel — warm, very rounded, dewy */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-violet-900/15 backdrop-blur-sm" />
+      {/* Panel */}
       <div
-        className="absolute top-[4.5rem] right-6 w-[30rem] max-h-[80vh] overflow-y-auto bg-white/95 backdrop-blur-sm rounded-[24px] shadow-warm-xl p-7 anim-slide-down dew-highlight"
+        className="relative w-[30rem] max-h-[80vh] overflow-y-auto bg-white/95 backdrop-blur-sm rounded-[24px] shadow-warm-xl p-7 anim-scale-in dew-highlight"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header — warm */}
@@ -161,7 +184,16 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  导出数据
+                  导出
+                </button>
+                <button
+                  onClick={importData}
+                  className="flex-1 py-2.5 rounded-full text-sm font-semibold text-teal-600 bg-teal-50 hover:bg-teal-100 transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  导入
                 </button>
                 <button
                   onClick={() => setShowClearConfirm(true)}
@@ -170,7 +202,7 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
-                  清除数据
+                  清除
                 </button>
               </div>
             )}
