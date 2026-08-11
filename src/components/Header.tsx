@@ -3,6 +3,8 @@ interface HeaderProps {
   doneTasks: number;
   onSettingsClick: () => void;
   onHelpClick: () => void;
+  onStatsClick: () => void;
+  onCabinetClick: () => void;
 }
 
 /** Cute butterfly mark — rounder, softer wings with little antennae */
@@ -28,7 +30,7 @@ function ButterflyMark({ size = 30 }: { size?: number }) {
   );
 }
 
-export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpClick }: HeaderProps) {
+export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpClick, onStatsClick, onCabinetClick }: HeaderProps) {
   return (
     <header className="relative z-30 h-[4rem] px-6 flex items-center justify-between bg-white/60 backdrop-blur-xl border-b border-violet-50/40 shadow-warm shrink-0">
       {/* Logo + Title */}
@@ -67,8 +69,22 @@ export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpC
           )}
         </div>
 
-        {/* Help + Settings — warm */}
+        {/* Cabinet + Stats + Help + Settings */}
         <div className="flex items-center gap-1.5">
+          <button
+            onClick={onCabinetClick}
+            className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
+            title="存储柜">
+            <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+          </button>
+          <button
+            onClick={onStatsClick}
+            className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
+            title="统计">
+            <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </button>
           <button
             onClick={onHelpClick}
             className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"

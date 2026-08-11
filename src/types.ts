@@ -18,7 +18,7 @@ export interface Task {
 export type Quadrant = 'do' | 'schedule' | 'delegate' | 'eliminate';
 export type TaskStatus = 'todo' | 'in_progress' | 'done';
 export type DateType = 'none' | 'point' | 'range';
-export type SortOption = 'default' | 'status' | 'created' | 'children';
+export type SortOption = 'default' | 'status' | 'created' | 'children' | 'category';
 export type RecurrenceType = 'none' | 'daily' | 'weekly' | 'monthly';
 
 export function getQuadrant(task: Task): Quadrant {

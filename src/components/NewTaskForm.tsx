@@ -6,6 +6,7 @@ import { QUADRANT_CONFIG } from '../types';
 interface NewTaskFormProps {
   editingTaskId: string | null;
   onDone: () => void;
+  defaultRecurrence?: RecurrenceType;
 }
 
 const QUADRANT_VALUES: Record<Quadrant, { urgency: 'high' | 'low'; importance: 'high' | 'low' }> = {
@@ -47,7 +48,7 @@ const QUADRANT_ICONS: Record<Quadrant, string> = {
   eliminate: '🗑️',
 };
 
-export default function NewTaskForm({ editingTaskId, onDone }: NewTaskFormProps) {
+export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }: NewTaskFormProps) {
   const tasks = useTaskStore((s) => s.tasks);
   const addTask = useTaskStore((s) => s.addTask);
   const updateTask = useTaskStore((s) => s.updateTask);
@@ -87,9 +88,9 @@ export default function NewTaskForm({ editingTaskId, onDone }: NewTaskFormProps)
       setStartDate('');
       setEndDate('');
       setNotes('');
-      setRecurrence('none');
+      setRecurrence(defaultRecurrence ?? 'none');
     }
-  }, [editingTask]);
+  }, [editingTask, defaultRecurrence]);
 
   const canSave = title.trim().length > 0;
 
@@ -118,7 +119,7 @@ export default function NewTaskForm({ editingTaskId, onDone }: NewTaskFormProps)
     setNotes('');
     setRecurrence('none');
     onDone();
-  }, [title, selectedQuadrant, dateType, startDate, endDate, editingTaskId, addTask, updateTask, onDone]);
+  }, [title, selectedQuadrant, dateType, startDate, endDate, notes, recurrence, editingTaskId, addTask, updateTask, onDone]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
@@ -143,7 +144,7 @@ export default function NewTaskForm({ editingTaskId, onDone }: NewTaskFormProps)
             </svg>
           </div>
           <h2 className="text-lg font-bold text-violet-900">
-            {editingTaskId ? '编辑任务' : '新建任务'}
+            {editingTaskId ? '编辑任务' : defaultRecurrence ? '新建周期任务' : '新建任务'}
           </h2>
         </div>
         <button

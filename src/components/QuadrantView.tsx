@@ -44,7 +44,7 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
   };
 
   // Filter: non-trashed, optionally hide done
-  const visibleTasks = tasks.filter((t) => !t.isTrashed && (showCompleted || t.status !== 'done'));
+  const visibleTasks = tasks.filter((t) => !t.isTrashed && !t.recurrence && (showCompleted || t.status !== 'done'));
 
   const grouped: Record<Quadrant, Task[]> = {
     do: [], schedule: [], delegate: [], eliminate: [],

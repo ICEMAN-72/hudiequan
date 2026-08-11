@@ -197,8 +197,11 @@ export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, o
           </span>
         )}
 
-        {!task.parentId && (
+        {!task.parentId && !task.recurrence && (
           <span className={`px-2.5 py-1 rounded-full text-xs font-bold shrink-0 ${qConfig.badge}`}>{qConfig.label}</span>
+        )}
+        {task.recurrence && task.recurrence !== 'none' && (
+          <span className="px-2.5 py-1 rounded-full text-xs font-bold shrink-0 bg-teal-50 text-teal-600">🔄 周期</span>
         )}
 
         {/* Actions */}

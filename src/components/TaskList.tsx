@@ -17,12 +17,13 @@ const SORT_LABELS: Record<SortOption, string> = {
   status: '按状态',
   created: '按时间',
   children: '子任务数',
+  category: '按类别',
 };
 
-const SORT_OPTIONS: SortOption[] = ['default', 'status', 'created', 'children'];
+const SORT_OPTIONS: SortOption[] = ['default', 'status', 'created', 'children', 'category'];
 
 function sortRootTasks(tasks: Task[], sortBy: SortOption): Task[] {
-  const roots = tasks.filter((t) => !t.parentId && !t.isTrashed);
+  const roots = tasks.filter((t) => !t.parentId && !t.isTrashed && !t.recurrence);
   switch (sortBy) {
     case 'status': {
       const order: Record<Task['status'], number> = { in_progress: 0, todo: 1, done: 2 };
@@ -33,6 +34,15 @@ function sortRootTasks(tasks: Task[], sortBy: SortOption): Task[] {
     case 'children': {
       const all = tasks.filter((t) => !t.isTrashed);
       return [...roots].sort((a, b) => all.filter((t) => t.parentId === b.id).length - all.filter((t) => t.parentId === a.id).length);
+    }
+    case 'category': {
+      return [...roots].sort((a, b) => {
+        const aCat = a.recurrence ? 1 : 0;
+        const bCat = b.recurrence ? 1 : 0;
+        if (aCat !== bCat) return aCat - bCat;
+        const order: Record<Task['status'], number> = { in_progress: 0, todo: 1, done: 2 };
+        return order[a.status] !== order[b.status] ? order[a.status] - order[b.status] : b.createdAt - a.createdAt;
+      });
     }
     default: {
       const order: Record<Task['status'], number> = { in_progress: 0, todo: 1, done: 2 };

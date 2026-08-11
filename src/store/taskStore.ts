@@ -112,20 +112,21 @@ export const useTaskStore = create<TaskState>()(
             t.id === id ? { ...t, status: nextStatus } : t
           ),
         }));
-        // If completing a recurring task, create next instance
-        if (task && nextStatus === 'done' && task.recurrence && task.recurrence !== 'none' && !task.recurrenceId) {
-          let nextStart: string | undefined;
-          if (task.startDate) {
-            const d = new Date(task.startDate);
-            if (task.recurrence === 'daily') d.setDate(d.getDate() + 1);
-            else if (task.recurrence === 'weekly') d.setDate(d.getDate() + 7);
-            else if (task.recurrence === 'monthly') d.setMonth(d.getMonth() + 1);
-            nextStart = d.toISOString().slice(0, 10);
-          }
-          let nextEnd: string | undefined;
-          if (nextStart && task.startDate && task.endDate) {
-            const diff = new Date(task.endDate).getTime() - new Date(task.startDate).getTime();
-            nextEnd = new Date(new Date(nextStart).getTime() + diff).toISOString().slice(0, 10);
+        // Auto-create next instance for recurring tasks
+        if (task && nextStatus === 'done' && task.recurrence && task.recurrence !== 'none') {
+          const now = new Date();
+          let nextDate: string;
+          if (task.recurrence === 'daily') {
+            const d = new Date(now); d.setDate(d.getDate() + 1);
+            nextDate = d.toISOString().slice(0, 10);
+          } else if (task.recurrence === 'weekly') {
+            const d = new Date(now);
+            const daysUntilMonday = (8 - d.getDay()) % 7 || 7;
+            d.setDate(d.getDate() + daysUntilMonday);
+            nextDate = d.toISOString().slice(0, 10);
+          } else {
+            const d = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            nextDate = d.toISOString().slice(0, 10);
           }
           const next: Task = {
             id: crypto.randomUUID(),
@@ -133,12 +134,11 @@ export const useTaskStore = create<TaskState>()(
             urgency: task.urgency,
             importance: task.importance,
             status: 'todo' as const,
-            dateType: task.dateType,
-            startDate: nextStart,
-            endDate: nextEnd,
+            dateType: 'point' as const,
+            startDate: nextDate,
             notes: task.notes,
             recurrence: task.recurrence,
-            recurrenceId: task.recurrenceId || task.id,
+            parentId: task.parentId,
             createdAt: Date.now(),
           };
           set((state) => ({ tasks: [...state.tasks, next] }));

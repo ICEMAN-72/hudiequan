@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSettingsStore } from '../store/settingsStore';
 import { useTaskStore } from '../store/taskStore';
+import SupabaseAccount from './SupabaseAccount';
 
 interface SettingsPanelProps {
   onClose: () => void;
@@ -13,6 +14,10 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
   const setShowCompleted = useSettingsStore((s) => s.setShowCompleted);
   const darkMode = useSettingsStore((s) => s.darkMode);
   const setDarkMode = useSettingsStore((s) => s.setDarkMode);
+  const reviewEnabled = useSettingsStore((s) => s.reviewEnabled);
+  const setReviewEnabled = useSettingsStore((s) => s.setReviewEnabled);
+  const reviewTime = useSettingsStore((s) => s.reviewTime);
+  const setReviewTime = useSettingsStore((s) => s.setReviewTime);
   const tasks = useTaskStore((s) => s.tasks);
   const setTasks = useTaskStore((s) => s.setTasks);
 
@@ -158,6 +163,34 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
           </div>
         </div>
 
+        {/* Review card */}
+        <div className="bg-violet-50/30 rounded-[20px] p-6 mb-5">
+          <div className="flex items-start gap-3.5 mb-5">
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white shadow-warm shrink-0">
+              <svg className="w-5 h-5 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            </div>
+            <div><h4 className="text-base font-bold text-violet-900">每日复盘</h4><p className="text-sm text-violet-400 mt-1">到时间弹出今日完成情况</p></div>
+          </div>
+          <div className="bg-white/70 rounded-[16px] p-5 flex items-center justify-between gap-4">
+            <div>
+              <span className="text-sm font-semibold text-violet-700">开启复盘</span>
+              <p className="text-xs text-violet-300 mt-1.5">每天定时提醒查看任务进度</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {reviewEnabled && (
+                <input type="time" value={reviewTime} onChange={(e) => setReviewTime(e.target.value)}
+                  className="w-[5rem] px-2 py-1.5 rounded-full text-xs text-violet-700 bg-violet-50/40 border border-violet-100 outline-none" />
+              )}
+              <button onClick={() => setReviewEnabled(!reviewEnabled)}
+                className={`relative w-[3.2rem] h-[1.7rem] rounded-full transition-colors duration-200 shrink-0 shadow-warm ${reviewEnabled ? 'bg-violet-500' : 'bg-violet-200'}`}>
+                <span className={`absolute top-[2.5px] w-[1.25rem] h-[1.25rem] rounded-full bg-white shadow-sm transition-all duration-200 ${reviewEnabled ? 'left-[1.7rem]' : 'left-[3px]'}`} />
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Data management card */}
         <div className="bg-violet-50/30 rounded-[20px] p-6">
           <div className="flex items-start gap-3.5 mb-5">
@@ -223,6 +256,22 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Cloud sync card */}
+        <div className="bg-violet-50/30 rounded-[20px] p-6">
+          <div className="flex items-start gap-3.5 mb-5">
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white shadow-warm shrink-0">
+              <svg className="w-5 h-5 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <div>
+              <h4 className="text-base font-bold text-violet-900">云端同步</h4>
+              <p className="text-sm text-violet-400 mt-1">Supabase 多设备数据同步</p>
+            </div>
+          </div>
+          <SupabaseAccount />
         </div>
       </div>
     </div>
