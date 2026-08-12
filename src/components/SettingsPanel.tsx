@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useSettingsStore } from '../store/settingsStore';
 import { useTaskStore } from '../store/taskStore';
-import SupabaseAccount from './SupabaseAccount';
 
 interface SettingsPanelProps {
   onClose: () => void;
@@ -256,22 +255,6 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Cloud sync card */}
-        <div className="bg-violet-50/30 rounded-[20px] p-6">
-          <div className="flex items-start gap-3.5 mb-5">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white shadow-warm shrink-0">
-              <svg className="w-5 h-5 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-            </div>
-            <div>
-              <h4 className="text-base font-bold text-violet-900">云端同步</h4>
-              <p className="text-sm text-violet-400 mt-1">Supabase 多设备数据同步</p>
-            </div>
-          </div>
-          <SupabaseAccount />
         </div>
       </div>
     </div>

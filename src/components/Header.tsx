@@ -5,6 +5,7 @@ interface HeaderProps {
   onHelpClick: () => void;
   onStatsClick: () => void;
   onCabinetClick: () => void;
+  onCloudClick: () => void;
 }
 
 /** Cute butterfly mark — rounder, softer wings with little antennae */
@@ -30,7 +31,7 @@ function ButterflyMark({ size = 30 }: { size?: number }) {
   );
 }
 
-export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpClick, onStatsClick, onCabinetClick }: HeaderProps) {
+export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpClick, onStatsClick, onCabinetClick, onCloudClick }: HeaderProps) {
   return (
     <header className="relative z-30 h-[4rem] px-6 flex items-center justify-between bg-white/60 backdrop-blur-xl border-b border-violet-50/40 shadow-warm shrink-0">
       {/* Logo + Title */}
@@ -69,13 +70,21 @@ export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpC
           )}
         </div>
 
-        {/* Cabinet + Stats + Help + Settings */}
+        {/* Cabinet + Cloud + Stats + Help + Settings */}
         <div className="flex items-center gap-1.5">
           <button
             onClick={onCabinetClick}
             className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
             title="存储柜">
             <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+          </button>
+          <button
+            onClick={onCloudClick}
+            className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-teal-500 hover:text-teal-700 hover:bg-teal-50/60 transition-colors"
+            title="云端同步">
+            <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
           </button>
           <button
             onClick={onStatsClick}

@@ -10,6 +10,7 @@ import RecurringTasksPanel from './components/RecurringTasksPanel';
 import SettingsPanel from './components/SettingsPanel';
 import CabinetDrawer from './components/CabinetDrawer';
 import HelpPanel from './components/HelpPanel';
+import SupabasePanel from './components/SupabasePanel';
 import BatchBar from './components/BatchBar';
 import StatsPanel from './components/StatsPanel';
 import Decorations from './components/Decorations';
@@ -22,6 +23,7 @@ function App() {
   const [showCabinet, setShowCabinet] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showStats, setShowStats] = useState(false);
+  const [showSupabase, setShowSupabase] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [recurringMode, setRecurringMode] = useState<RecurrenceType | undefined>(undefined);
@@ -82,6 +84,7 @@ function App() {
         onHelpClick={() => setShowHelp(true)}
         onStatsClick={() => setShowStats(true)}
         onCabinetClick={() => setShowCabinet(true)}
+        onCloudClick={() => setShowSupabase(true)}
       />
 
       {/* 2x2 四宫格布局 */}
@@ -139,6 +142,7 @@ function App() {
       {showCabinet && <CabinetDrawer onEdit={openEditDrawer} onClose={() => setShowCabinet(false)} />}
       {showHelp && <HelpPanel onClose={() => setShowHelp(false)} />}
       {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
+      {showSupabase && <SupabasePanel onClose={() => setShowSupabase(false)} />}
     </div>
   );
 }
