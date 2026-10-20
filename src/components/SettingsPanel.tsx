@@ -1,9 +1,17 @@
 import { useState } from 'react';
 import { useSettingsStore } from '../store/settingsStore';
 import { useTaskStore } from '../store/taskStore';
+import { getBackupTime } from '../lib/safeStorage';
+import type { Task } from '../types';
 
 interface SettingsPanelProps {
   onClose: () => void;
+}
+
+function formatBackupTime(iso: string | null): string {
+  if (!iso) return '暂无备份';
+  const d = new Date(iso);
+  return `${d.getMonth() + 1}月${d.getDate()}日 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
 export default function SettingsPanel({ onClose }: SettingsPanelProps) {
@@ -21,8 +29,18 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
   const setTasks = useTaskStore((s) => s.setTasks);
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [notice, setNotice] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+
+  const flash = (type: 'ok' | 'err', text: string) => {
+    setNotice({ type, text });
+    setTimeout(() => setNotice(null), 4000);
+  };
 
   const exportData = () => {
+    if (tasks.length === 0) {
+      flash('err', '当前没有任务可导出');
+      return;
+    }
     const data = JSON.stringify({ tasks, exportedAt: new Date().toISOString() }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -31,11 +49,13 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
     a.download = `蝴蝶泉任务备份-${new Date().toLocaleDateString()}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    flash('ok', `已导出 ${tasks.length} 个任务`);
   };
 
   const clearData = () => {
     setTasks([]);
     setShowClearConfirm(false);
+    flash('ok', '已清除全部任务');
   };
 
   const importData = () => {
@@ -49,10 +69,23 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
       reader.onload = () => {
         try {
           const data = JSON.parse(reader.result as string);
-          if (data.tasks && Array.isArray(data.tasks)) {
-            setTasks(data.tasks as typeof tasks);
+          const list = Array.isArray(data) ? data : data?.tasks;
+          if (!Array.isArray(list)) {
+            flash('err', '文件格式不对：需要包含 tasks 数组');
+            return;
           }
-        } catch { /* ignore invalid files */ }
+          if (list.length === 0) {
+            flash('err', '文件里没有任何任务');
+            return;
+          }
+          if (tasks.length > 0 && !window.confirm(`导入将覆盖当前的 ${tasks.length} 个任务，确定继续吗？`)) {
+            return;
+          }
+          setTasks(list as Task[]);
+          flash('ok', `已导入 ${list.length} 个任务`);
+        } catch {
+          flash('err', '文件读取失败，可能不是有效的 JSON 备份');
+        }
       };
       reader.readAsText(file);
     };
@@ -200,11 +233,25 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
             </div>
             <div>
               <h4 className="text-base font-bold text-violet-900">数据管理</h4>
-              <p className="text-sm text-violet-400 mt-1">导出或清除本地任务数据</p>
+              <p className="text-sm text-violet-400 mt-1">导出、导入或清除任务 · 自动保留上一版快照</p>
             </div>
           </div>
 
           <div className="bg-white/70 rounded-[16px] p-5">
+            <div className="flex items-center justify-between mb-3 px-1">
+              <span className="text-xs text-violet-400">
+                🛟 本地快照：{formatBackupTime(getBackupTime())}
+              </span>
+              <span className="text-xs text-violet-300">{tasks.length} 个任务</span>
+            </div>
+
+            {notice && (
+              <div className={`mb-3 px-3.5 py-2.5 rounded-[12px] text-xs font-medium anim-fade-in ${
+                notice.type === 'ok' ? 'bg-teal-50 text-teal-600' : 'bg-pink-50 text-pink-600'
+              }`}>
+                {notice.type === 'ok' ? '✓ ' : '✕ '}{notice.text}
+              </div>
+            )}
             {showClearConfirm ? (
               <div className="anim-fade-in">
                 <p className="text-sm text-pink-600 font-medium mb-4">确定要清除所有数据吗？此操作不可恢复。</p>

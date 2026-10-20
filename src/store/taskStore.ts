@@ -1,7 +1,8 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Task, DateType, SortOption, RecurrenceType } from '../types';
 import { getDescendantIds, isDescendantOf, NEXT_STATUS } from '../types';
+import { safeTaskStorage } from '../lib/safeStorage';
 
 interface TaskState {
   tasks: Task[];
@@ -164,10 +165,12 @@ export const useTaskStore = create<TaskState>()(
     {
       name: 'hudiequan-tasks',
       version: 4,
+      storage: createJSONStorage(() => safeTaskStorage),
       migrate: (persistedState: unknown, version: number) => {
         if (version < 2) {
-          const state = persistedState as { tasks: unknown[] };
-          const migrated = state.tasks.map((t) => {
+          const state = persistedState as { tasks?: unknown[] };
+          const list = Array.isArray(state.tasks) ? state.tasks : [];
+          const migrated = list.map((t) => {
             const old = t as Record<string, unknown>;
             return {
               id: old.id as string,
@@ -186,14 +189,17 @@ export const useTaskStore = create<TaskState>()(
           return { tasks: migrated, sortBy: 'default' as SortOption };
         }
         if (version < 3) {
-          const state = persistedState as { tasks: unknown[] };
-          const migrated = (state.tasks as Task[]).map((t) => ({ ...t, isTrashed: false }));
+          const state = persistedState as { tasks?: unknown[] };
+          const list = Array.isArray(state.tasks) ? (state.tasks as Task[]) : [];
+          const migrated = list.map((t) => ({ ...t, isTrashed: false }));
           return { tasks: migrated, sortBy: 'default' as SortOption };
         }
         if (version < 4) {
-          const state = persistedState as { tasks: unknown[] };
-          const migrated = (state.tasks as Task[]).map((t) => ({ ...t, notes: undefined, recurrence: undefined }));
-          return { tasks: migrated, sortBy: (state as TaskState).sortBy || 'default' as SortOption };
+          const state = persistedState as { tasks?: unknown[]; sortBy?: SortOption };
+          const list = Array.isArray(state.tasks) ? (state.tasks as Task[]) : [];
+          // 保留已有字段，绝不清空 notes / recurrence
+          const migrated = list.map((t) => ({ ...t }));
+          return { tasks: migrated, sortBy: state.sortBy || ('default' as SortOption) };
         }
         return persistedState as TaskState;
       },

@@ -14,6 +14,7 @@ import SupabasePanel from './components/SupabasePanel';
 import BatchBar from './components/BatchBar';
 import StatsPanel from './components/StatsPanel';
 import Decorations from './components/Decorations';
+import DataRecoveryBanner from './components/DataRecoveryBanner';
 import type { RecurrenceType } from './types';
 
 function App() {
@@ -76,6 +77,7 @@ function App() {
   return (
     <div className="h-screen flex flex-col overflow-hidden relative">
       <Decorations />
+      <DataRecoveryBanner />
 
       <Header
         totalTasks={totalTasks}
