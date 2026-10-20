@@ -20,8 +20,23 @@ npm run build      # tsc -b + vite build
 npm run lint       # oxlint
 npm test           # 日期逻辑回归测试（30 项）
 npm run shots      # 拍全套界面截图到 tools/shots/
-npm run deploy     # 构建并发布到 gh-pages
+npm run deploy     # 等价于 git push origin master
 ```
+
+## 部署
+
+**只有一条路：`git push` 到 master。**
+
+`.github/workflows/deploy.yml` 会在 push 后自动 `npm ci && npm run build`，
+把 `dist/` 作为 artifact 发布到 GitHub Pages（Pages 的 Source 是 **GitHub Actions**，不是分支）。
+
+所以：
+
+- `npm run deploy` 现在就是 `git push origin master`，不需要在本地构建
+- **不要**用 `npx gh-pages -d dist`。仓库里没有 `gh-pages` 分支也不需要它；
+  真推一个上去，Pages 也不会读（Source 已经是 Actions），只会在仓库里留个没人用的孤儿分支
+- push 后约 1～2 分钟生效。验证方法：打开线上 `index.html`，
+  里面引用的 `assets/index-<hash>.js` 应该和本地 `dist/assets/` 里的文件名一致
 
 ## 目录
 
