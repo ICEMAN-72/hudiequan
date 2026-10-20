@@ -417,19 +417,6 @@ await shot('10-newtask');
 await closeModal();
 await sleep(400);
 
-// 新建任务抽屉（FAB）
-await reload(false);
-await sleep(700);
-console.log(await evalJs(`(() => {
-  const b = [...document.querySelectorAll('button')].find(n => n.className.includes('fixed') && n.className.includes('bottom-5'));
-  if (!b) return 'MISS:FAB';
-  b.click(); return 'OK';
-})()`));
-await sleep(900);
-await shot('10-newtask');
-await closeModal();
-await sleep(400);
-
 // 日历：切到日视图（点击「日」按钮）
 await reload(false);
 await sleep(600);
