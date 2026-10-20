@@ -298,7 +298,7 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
               <button
                 onClick={chooseFolder}
                 disabled={busy}
-                className="w-full py-2.5 rounded-full fs-xs font-semibold text-violet-600 bg-violet-50 hover:bg-violet-100 transition-colors disabled:opacity-50"
+                className="action-chip action-chip--violet w-full fs-xs disabled:opacity-50"
               >
                 {busy ? '等待授权…' : '选择备份文件夹'}
               </button>
@@ -336,7 +336,7 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                 <p className="fs-xs text-pink-600 font-medium mb-3">确定清除所有任务？这个操作不可撤销。</p>
                 <div className="flex gap-2">
                   <button onClick={() => setShowClearConfirm(false)}
-                    className="flex-1 py-2 rounded-full fs-xs font-semibold text-violet-500 bg-violet-50 hover:bg-violet-100 transition-colors">
+                    className="action-chip action-chip--violet flex-1 fs-xs">
                     取消
                   </button>
                   <button onClick={clearData}
@@ -437,14 +437,14 @@ function ActionButton({
   icon: React.ReactNode;
 }) {
   const tones = {
-    violet: 'text-violet-600 bg-violet-50 hover:bg-violet-100',
-    teal: 'text-teal-600 bg-teal-50 hover:bg-teal-100',
-    pink: 'text-pink-500 bg-pink-50 hover:bg-pink-100',
+    violet: 'action-chip--violet',
+    teal: 'action-chip--teal',
+    pink: 'action-chip--pink',
   } as const;
   return (
     <button
       onClick={onClick}
-      className={`py-2 rounded-full fs-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${tones[tone]}`}
+      className={`action-chip fs-xs ${tones[tone]}`}
     >
       <svg className="w-[0.95rem] h-[0.95rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         {icon}

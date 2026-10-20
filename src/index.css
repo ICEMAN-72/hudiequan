@@ -353,10 +353,88 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
 .dark .divide-violet-50 > * + * { border-color: rgba(124, 58, 237, 0.1) !important; }
 .dark .surface-panel { background: rgba(32, 27, 50, 0.62) !important; }
 .dark .surface-card {
-  background: rgba(52, 45, 78, 0.92) !important;
+  background: rgba(49, 41, 80, 0.94) !important;
   border-color: rgba(124, 58, 237, 0.16) !important;
 }
-.dark .dialog-sheet { background: rgba(38, 32, 58, 0.98) !important; border-color: rgba(124, 58, 237, 0.18) !important; }
+.dark .dialog-sheet, .dark .sheet-paper { background: rgba(34, 29, 52, 0.98) !important; border-color: rgba(124, 58, 237, 0.18) !important; }
+/* ---- 深色模式补漏（第二轮，按「用到但没覆盖」扫出来的清单） ----
+   原则：浅色底在深色下必须压成半透明深色，
+   浅底上的深字必须翻成亮字，否则要么刺眼要么看不见。 */
+.dark .bg-violet-50\/25 { background: rgba(124, 58, 237, 0.05) !important; }
+.dark .bg-violet-50\/35 { background: rgba(124, 58, 237, 0.07) !important; }
+.dark .bg-violet-50\/70 { background: rgba(124, 58, 237, 0.12) !important; }
+.dark .bg-violet-100\/40 { background: rgba(124, 58, 237, 0.12) !important; }
+.dark .bg-violet-200 { background: rgba(124, 58, 237, 0.26) !important; }
+.dark .bg-violet-300 { background: rgba(139, 92, 246, 0.38) !important; }
+.dark .bg-amber-50\/95 { background: rgba(120, 80, 20, 0.55) !important; }
+.dark .bg-pink-50\/95 { background: rgba(120, 40, 80, 0.55) !important; }
+
+.dark .border-violet-100\/40 { border-color: rgba(124, 58, 237, 0.16) !important; }
+.dark .border-violet-100\/70 { border-color: rgba(124, 58, 237, 0.2) !important; }
+.dark .border-violet-200 { border-color: rgba(124, 58, 237, 0.26) !important; }
+.dark .border-violet-200\/50 { border-color: rgba(124, 58, 237, 0.24) !important; }
+.dark .border-violet-300 { border-color: rgba(124, 58, 237, 0.38) !important; }
+.dark .border-violet-400 { border-color: rgba(139, 92, 246, 0.55) !important; }
+.dark .border-violet-500 { border-color: rgba(139, 92, 246, 0.7) !important; }
+.dark .border-pink-100\/30 { border-color: rgba(236, 72, 153, 0.14) !important; }
+.dark .border-pink-200 { border-color: rgba(236, 72, 153, 0.24) !important; }
+.dark .border-pink-300 { border-color: rgba(236, 72, 153, 0.38) !important; }
+.dark .border-teal-100\/50 { border-color: rgba(20, 184, 166, 0.18) !important; }
+.dark .border-teal-200 { border-color: rgba(20, 184, 166, 0.26) !important; }
+.dark .border-amber-200 { border-color: rgba(251, 191, 36, 0.32) !important; }
+
+.dark .ring-violet-50 { --tw-ring-color: rgba(124, 58, 237, 0.16) !important; }
+.dark .ring-violet-100 { --tw-ring-color: rgba(124, 58, 237, 0.24) !important; }
+.dark .ring-violet-200 { --tw-ring-color: rgba(124, 58, 237, 0.3) !important; }
+.dark .ring-violet-200\/40 { --tw-ring-color: rgba(124, 58, 237, 0.26) !important; }
+.dark .ring-violet-300 { --tw-ring-color: rgba(124, 58, 237, 0.42) !important; }
+.dark .ring-violet-400 { --tw-ring-color: rgba(139, 92, 246, 0.6) !important; }
+.dark .ring-pink-50 { --tw-ring-color: rgba(236, 72, 153, 0.16) !important; }
+
+.dark .text-amber-800 { color: #FCD34D !important; }
+.dark .text-pink-700 { color: #F9A8D4 !important; }
+.dark .text-pink-800 { color: #FBCFE8 !important; }
+.dark .text-teal-200 { color: #99F6E4 !important; }
+
+/* ---- 深色模式补漏（第二轮，按「用到但没覆盖」扫出来的清单） ----
+   原则：浅色底在深色下必须压成半透明深色，
+   浅底上的深字必须翻成亮字，否则要么刺眼要么看不见。 */
+.dark .bg-violet-50\/25 { background: rgba(124, 58, 237, 0.05) !important; }
+.dark .bg-violet-50\/35 { background: rgba(124, 58, 237, 0.07) !important; }
+.dark .bg-violet-50\/70 { background: rgba(124, 58, 237, 0.12) !important; }
+.dark .bg-violet-100\/40 { background: rgba(124, 58, 237, 0.12) !important; }
+.dark .bg-violet-200 { background: rgba(124, 58, 237, 0.26) !important; }
+.dark .bg-violet-300 { background: rgba(139, 92, 246, 0.38) !important; }
+.dark .bg-amber-50\/95 { background: rgba(120, 80, 20, 0.55) !important; }
+.dark .bg-pink-50\/95 { background: rgba(120, 40, 80, 0.55) !important; }
+
+.dark .border-violet-100\/40 { border-color: rgba(124, 58, 237, 0.16) !important; }
+.dark .border-violet-100\/70 { border-color: rgba(124, 58, 237, 0.2) !important; }
+.dark .border-violet-200 { border-color: rgba(124, 58, 237, 0.26) !important; }
+.dark .border-violet-200\/50 { border-color: rgba(124, 58, 237, 0.24) !important; }
+.dark .border-violet-300 { border-color: rgba(124, 58, 237, 0.38) !important; }
+.dark .border-violet-400 { border-color: rgba(139, 92, 246, 0.55) !important; }
+.dark .border-violet-500 { border-color: rgba(139, 92, 246, 0.7) !important; }
+.dark .border-pink-100\/30 { border-color: rgba(236, 72, 153, 0.14) !important; }
+.dark .border-pink-200 { border-color: rgba(236, 72, 153, 0.24) !important; }
+.dark .border-pink-300 { border-color: rgba(236, 72, 153, 0.38) !important; }
+.dark .border-teal-100\/50 { border-color: rgba(20, 184, 166, 0.18) !important; }
+.dark .border-teal-200 { border-color: rgba(20, 184, 166, 0.26) !important; }
+.dark .border-amber-200 { border-color: rgba(251, 191, 36, 0.32) !important; }
+
+.dark .ring-violet-50 { --tw-ring-color: rgba(124, 58, 237, 0.16) !important; }
+.dark .ring-violet-100 { --tw-ring-color: rgba(124, 58, 237, 0.24) !important; }
+.dark .ring-violet-200 { --tw-ring-color: rgba(124, 58, 237, 0.3) !important; }
+.dark .ring-violet-200\/40 { --tw-ring-color: rgba(124, 58, 237, 0.26) !important; }
+.dark .ring-violet-300 { --tw-ring-color: rgba(124, 58, 237, 0.42) !important; }
+.dark .ring-violet-400 { --tw-ring-color: rgba(139, 92, 246, 0.6) !important; }
+.dark .ring-pink-50 { --tw-ring-color: rgba(236, 72, 153, 0.16) !important; }
+
+.dark .text-amber-800 { color: #FCD34D !important; }
+.dark .text-pink-700 { color: #F9A8D4 !important; }
+.dark .text-pink-800 { color: #FBCFE8 !important; }
+.dark .text-teal-200 { color: #99F6E4 !important; }
+
 .dark .text-ink { color: #E4DEF7 !important; }
 .dark .text-ink-soft { color: #A9A2C4 !important; }
 .dark .text-ink-muted { color: #7B7496 !important; }
@@ -379,7 +457,9 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
    body 单独滚动，滚动内容永远不会顶到圆角上。
    ========================================================================== */
 .dialog-sheet {
-  background: rgba(255, 255, 255, 0.97);
+  /* 不能是纯白：里面的 surface-card 也是纯白，两者同色会糊成一片。
+     留一层几乎看不出的紫调，白色卡片才有地方浮起来。 */
+  background: rgba(249, 247, 255, 0.97);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(124, 58, 237, 0.10);
   border-radius: 26px;
@@ -388,6 +468,10 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
   max-height: calc(100vh - 4rem);
   overflow: hidden;
   box-shadow: 0 24px 80px rgba(124, 58, 237, 0.16), 0 8px 32px rgba(236, 72, 153, 0.10);
+}
+
+.sheet-paper {
+  background: rgba(249, 247, 255, 0.97);
 }
 
 .dialog-header {
@@ -422,6 +506,58 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
 }
 
 /* 图标按钮 —— 统一按压反馈 */
+/* 次级操作 chip —— 必须自带边框/底色，否则 bg-violet-50 这种
+   落在同样是淡紫的弹窗纸上会彻底隐形。 */
+.action-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+}
+.action-chip:active { transform: scale(0.97); }
+
+.action-chip--violet { color: #6D28D9; background: rgba(124, 58, 237, 0.10); border-color: rgba(124, 58, 237, 0.20); }
+.action-chip--violet:hover { background: rgba(124, 58, 237, 0.16); border-color: rgba(124, 58, 237, 0.30); }
+.action-chip--teal { color: #0F766E; background: rgba(20, 184, 166, 0.10); border-color: rgba(20, 184, 166, 0.22); }
+.action-chip--teal:hover { background: rgba(20, 184, 166, 0.16); border-color: rgba(20, 184, 166, 0.32); }
+.action-chip--pink { color: #DB2777; background: rgba(236, 72, 153, 0.10); border-color: rgba(236, 72, 153, 0.22); }
+.action-chip--pink:hover { background: rgba(236, 72, 153, 0.16); border-color: rgba(236, 72, 153, 0.32); }
+
+.dark .action-chip--violet { color: #C4B5FD; background: rgba(124, 58, 237, 0.18); border-color: rgba(124, 58, 237, 0.30); }
+.dark .action-chip--teal { color: #5EEAD4; background: rgba(20, 184, 166, 0.16); border-color: rgba(20, 184, 166, 0.30); }
+.dark .action-chip--pink { color: #F9A8D4; background: rgba(236, 72, 153, 0.16); border-color: rgba(236, 72, 153, 0.30); }
+
+/* 次级操作 chip —— 必须自带边框/底色，否则 bg-violet-50 这种
+   落在同样是淡紫的弹窗纸上会彻底隐形。 */
+.action-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+}
+.action-chip:active { transform: scale(0.97); }
+
+.action-chip--violet { color: #6D28D9; background: rgba(124, 58, 237, 0.10); border-color: rgba(124, 58, 237, 0.20); }
+.action-chip--violet:hover { background: rgba(124, 58, 237, 0.16); border-color: rgba(124, 58, 237, 0.30); }
+.action-chip--teal { color: #0F766E; background: rgba(20, 184, 166, 0.10); border-color: rgba(20, 184, 166, 0.22); }
+.action-chip--teal:hover { background: rgba(20, 184, 166, 0.16); border-color: rgba(20, 184, 166, 0.32); }
+.action-chip--pink { color: #DB2777; background: rgba(236, 72, 153, 0.10); border-color: rgba(236, 72, 153, 0.22); }
+.action-chip--pink:hover { background: rgba(236, 72, 153, 0.16); border-color: rgba(236, 72, 153, 0.32); }
+
+.dark .action-chip--violet { color: #C4B5FD; background: rgba(124, 58, 237, 0.18); border-color: rgba(124, 58, 237, 0.30); }
+.dark .action-chip--teal { color: #5EEAD4; background: rgba(20, 184, 166, 0.16); border-color: rgba(20, 184, 166, 0.30); }
+.dark .action-chip--pink { color: #F9A8D4; background: rgba(236, 72, 153, 0.16); border-color: rgba(236, 72, 153, 0.30); }
+
 .icon-btn {
   display: inline-flex;
   align-items: center;

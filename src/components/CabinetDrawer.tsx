@@ -68,7 +68,7 @@ export default function CabinetDrawer({ onEdit, onClose }: CabinetDrawerProps) {
       ) : (
         <div className="space-y-2.5 stagger">
           {list.map((task) => (
-            <TaskNode key={task.id} task={task} depth={0} allTasks={tasks} onEdit={onEdit} />
+            <TaskNode key={task.id} task={task} depth={0} allTasks={tasks} onEdit={onEdit} dimDone={false} />
           ))}
         </div>
       )}

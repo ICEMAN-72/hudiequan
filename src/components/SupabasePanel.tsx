@@ -251,11 +251,11 @@ export default function SupabasePanel({ onClose }: SupabasePanelProps) {
 
             <div className="flex gap-2.5">
               <button onClick={handleUpload} disabled={busy}
-                className="flex-1 py-2.5 rounded-full fs-xs font-bold bg-violet-50 text-violet-600 hover:bg-violet-100 disabled:opacity-40 transition-colors">
+                className="action-chip action-chip--violet flex-1 fs-xs disabled:opacity-40">
                 ↑ 上传
               </button>
               <button onClick={handlePull} disabled={busy}
-                className="flex-1 py-2.5 rounded-full fs-xs font-bold bg-teal-50 text-teal-600 hover:bg-teal-100 disabled:opacity-40 transition-colors">
+                className="action-chip action-chip--teal flex-1 fs-xs disabled:opacity-40">
                 ↓ 拉取
               </button>
             </div>

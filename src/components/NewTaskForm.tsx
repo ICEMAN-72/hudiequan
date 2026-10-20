@@ -132,7 +132,7 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
 
   return (
     <div
-      className="bg-white/97 backdrop-blur-xl rounded-[26px] shadow-warm-xl flex flex-col max-h-[calc(100vh-4rem)] overflow-hidden anim-sheet-in"
+      className="sheet-paper backdrop-blur-xl rounded-[26px] shadow-warm-xl flex flex-col max-h-[calc(100vh-4rem)] overflow-hidden anim-sheet-in"
       onKeyDown={handleKeyDown}
     >
       {/* Header */}

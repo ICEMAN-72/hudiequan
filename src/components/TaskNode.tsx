@@ -19,6 +19,12 @@ interface TaskNodeProps {
   onEdit: (id: string) => void;
   selectedIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
+  /**
+   * 已完成/已删除时是否整体降透明度。
+   * 主列表里需要（把做完的压下去），但存储柜里每一条都是已完成/已删除的，
+   * 再统一降透明度只会让整个列表发虚、卡片边界消失 → 那里传 false。
+   */
+  dimDone?: boolean;
 }
 
 /** Status circle — click to cycle: todo → in_progress → done */
@@ -74,7 +80,7 @@ function sortChildren(children: Task[]): Task[] {
   });
 }
 
-export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, onToggleSelect }: TaskNodeProps) {
+export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, onToggleSelect, dimDone = true }: TaskNodeProps) {
   const cycleStatus = useTaskStore((s) => s.cycleStatus);
   const deleteTask = useTaskStore((s) => s.deleteTask);
   const restoreTask = useTaskStore((s) => s.restoreTask);
@@ -126,7 +132,7 @@ export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, o
           dragOver
             ? 'ring-2 ring-violet-300 ring-offset-2 shadow-warm-hover'
             : 'shadow-warm hover:shadow-warm-hover hover:-translate-y-[1px]'
-        } ${isDone || isTrash ? 'opacity-45' : ''} ${isSelected ? 'ring-2 ring-violet-400 bg-violet-50/40' : ''}`}
+        } ${dimDone && (isDone || isTrash) ? 'opacity-45' : ''} ${isSelected ? 'ring-2 ring-violet-400 bg-violet-50/40' : ''}`}
         style={{ marginLeft: indentPx }}
         title={isDone ? `完成于 ${formatTime(task.finishedAt ?? task.createdAt)}` : `创建于 ${formatTime(task.createdAt)}`}
       >
@@ -268,7 +274,7 @@ export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, o
       {expanded && children.length > 0 && (
         <div className="mt-2 space-y-2">
           {sortChildren(children).map((child) => (
-            <TaskNode key={child.id} task={child} depth={depth + 1} allTasks={allTasks} onEdit={onEdit} selectedIds={selectedIds} onToggleSelect={onToggleSelect} />
+            <TaskNode key={child.id} task={child} depth={depth + 1} allTasks={allTasks} onEdit={onEdit} selectedIds={selectedIds} onToggleSelect={onToggleSelect} dimDone={dimDone} />
           ))}
         </div>
       )}
