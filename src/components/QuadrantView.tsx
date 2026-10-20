@@ -66,42 +66,43 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
   const totalCount = visibleTasks.filter((t) => !t.parentId).length;
 
   return (
-    <div className="h-full flex flex-col p-4 anim-slide-up">
-      <div className="flex items-center gap-2.5 mb-3 shrink-0">
-        <svg className="w-[1.2rem] h-[1.2rem] text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <div className="h-full flex flex-col p-3 anim-slide-up">
+      <div className="flex items-center gap-1.5 mb-1 shrink-0">
+        <svg className="w-[0.95rem] h-[0.95rem] text-violet-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h16v16H4z M4 12h16 M12 4v16" />
         </svg>
         <h3 className="text-sm font-bold text-violet-800">四象限</h3>
-        <span className="text-xs text-violet-300">{totalCount} 项</span>
+        <span className="fs-2xs text-violet-300 tabular-nums">{totalCount} 项</span>
       </div>
 
-      <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-2 gap-3">
+      {/* gap 12→8：四个格子各自的高度就多出 8px，全都还给任务条 */}
+      <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-2 gap-2">
         {LAYOUT.flat().map((q) => {
           const config = QUADRANT_CONFIG[q];
           const items = grouped[q];
 
           return (
             <div key={q}
-              className={`${config.bg} ${config.border} border rounded-[16px] flex flex-col overflow-hidden min-h-0 dew-highlight shadow-warm`}
+              className={`${config.bg} ${config.border} border rounded-[12px] flex flex-col overflow-hidden min-h-0 dew-highlight shadow-warm`}
               onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
               onDrop={(e) => {
                 e.preventDefault(); e.stopPropagation();
                 const taskId = e.dataTransfer.getData('task/id');
                 if (taskId) { const vals = QUADRANT_VALUES[q]; updateTask(taskId, vals); }
               }}>
-              <div className={`${config.headerBg} px-4 py-3 border-b ${config.border} shrink-0`}>
-                <div className="flex items-center justify-between">
-                  <h4 className={`text-sm font-bold ${config.headerText}`}>{config.label}</h4>
-                  {items.length > 0 && (
-                    <span className={`text-xs font-bold ${config.headerText} opacity-50 tabular-nums`}>{items.length}</span>
-                  )}
-                </div>
-                <p className={`text-xs mt-1.5 ${config.headerText} opacity-45`}>{config.subtitle}</p>
+              {/* 象限头部压成单行：标题 + 说明 + 数量。
+                  原来是「标题行 + 说明行」，两行吃掉 63px，而每个格子总共才 200 出头 —— 光标题就占掉三成。 */}
+              <div className={`${config.headerBg} px-2 py-1 border-b ${config.border} shrink-0 flex items-baseline gap-1.5`}>
+                <h4 className={`fs-xs font-bold shrink-0 ${config.headerText}`}>{config.label}</h4>
+                <p className={`fs-2xs flex-1 truncate ${config.headerText} opacity-40`} title={config.subtitle}>{config.subtitle}</p>
+                {items.length > 0 && (
+                  <span className={`fs-2xs font-bold shrink-0 ${config.headerText} opacity-50 tabular-nums`}>{items.length}</span>
+                )}
               </div>
 
-              <div className="p-3 space-y-2 flex-1 overflow-y-auto scroll-thin min-h-0">
+              <div className="p-1 space-y-1.5 flex-1 overflow-y-auto scroll-thin min-h-0">
                 {items.length === 0 ? (
-                  <div className="flex items-center justify-center h-full py-8"><span className="fs-xs text-violet-200">—</span></div>
+                  <div className="flex items-center justify-center h-full py-4"><span className="fs-2xs text-violet-200">—</span></div>
                 ) : (
                   items.map((task) => renderTree(task, 0, visibleTasks, onEdit, cycleStatus))
                 )}

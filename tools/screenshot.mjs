@@ -257,6 +257,9 @@ const tasks = [
     templateId: 'tpl-b3',
     createdAt: now - 10 * DAY,
   }),
+  // 计划安排补充
+  T({ id: 'b4', title: '看完《医学信息学》第三章并摘录', urgency: 'low', importance: 'high', createdAt: now - 3 * DAY }),
+  T({ id: 'b5', title: '给万重浪补一份路线图', urgency: 'low', importance: 'high', status: 'in_progress', createdAt: now - 6 * DAY }),
   // 委托处理
   T({
     id: 'c1',
@@ -273,6 +276,8 @@ const tasks = [
     status: 'in_progress',
     createdAt: now - 1 * DAY,
   }),
+  // 委托处理补充
+  T({ id: 'c3', title: '让室友帮忙带快递', urgency: 'high', importance: 'low', createdAt: now - 12 * 3600000 }),
   // 尽量减少
   T({
     id: 'd1',
@@ -281,6 +286,8 @@ const tasks = [
     importance: 'low',
     createdAt: now - 8 * DAY,
   }),
+  T({ id: 'd2', title: '整理多年没动的收藏夹', urgency: 'low', importance: 'low', createdAt: now - 7 * DAY }),
+  T({ id: 'd3', title: '研究一下新的番茄钟 App', urgency: 'low', importance: 'low', createdAt: now - 5 * DAY }),
   // 周期任务：本期 + 往期
   T({
     id: 'r1',
@@ -437,6 +444,59 @@ console.log(await clickByText('设置'));
 await sleep(900);
 await shot('z5-settings-card', { x: 380, y: 40, width: 920, height: 760 });
 await closeModal();
+
+// ---------- 5. 信息密度实测 ----------
+await reload(false);
+await sleep(1200);
+const density = await evalJs(`(() => {
+  const desc = (el) => {
+    if (!el) return null;
+    const cs = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    return {
+      h: +r.height.toFixed(1), w: +r.width.toFixed(1),
+      padX: cs.paddingLeft + '/' + cs.paddingRight,
+      padY: cs.paddingTop + '/' + cs.paddingBottom,
+      fs: cs.fontSize, lh: cs.lineHeight,
+    };
+  };
+  const quads = [...document.querySelectorAll('[class*="dew-highlight"]')].map((q) => {
+    const head = q.children[0];
+    const body = q.children[1];
+    const card = body && body.firstElementChild;
+    const bodyH = body ? body.getBoundingClientRect().height : 0;
+    const cardH = card ? card.getBoundingClientRect().height : 0;
+    const gap = body ? (parseFloat(getComputedStyle(body).rowGap) || 0) : 0;
+    return {
+      label: (q.querySelector('h4') || {}).textContent,
+      quadH: +q.getBoundingClientRect().height.toFixed(1),
+      headH: head ? +head.getBoundingClientRect().height.toFixed(1) : null,
+      bodyH: Math.round(bodyH),
+      cardH: +cardH.toFixed(1),
+      total: body ? body.children.length : 0,
+      fit: cardH ? Math.floor((bodyH + gap) / (cardH + gap)) : 0,
+      cardStyle: desc(card && card.firstElementChild),
+    };
+  });
+
+  const listWrap = document.querySelector('[data-list="tasks"]');
+  let list = null;
+  if (listWrap) {
+    const cardH = listWrap.firstElementChild.getBoundingClientRect().height;
+    const gap = parseFloat(getComputedStyle(listWrap).rowGap) || 0;
+    const bodyH = listWrap.getBoundingClientRect().height;
+    list = {
+      bodyH: Math.round(bodyH),
+      cardH: +cardH.toFixed(1),
+      total: listWrap.children.length,
+      fit: cardH ? Math.floor((bodyH + gap) / (cardH + gap)) : 0,
+      cardStyle: desc(listWrap.firstElementChild),
+    };
+  }
+  return JSON.stringify({ list, quadrants: quads }, null, 1);
+})()`);
+console.log('--- 信息密度 ---');
+console.log(density);
 
 console.log('done');
 ws.close();

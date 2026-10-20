@@ -90,7 +90,7 @@ export default function TaskList({ onEdit, searchQuery, onSearchChange, selected
   if (activeTasks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center anim-fade-in">
-        <div className="w-[4.5rem] h-[4.5rem] mb-6 opacity-[0.15]">
+        <div className="w-[3.5rem] h-[3.5rem] mb-4 opacity-[0.15]">
           <svg viewBox="0 0 32 32" fill="none">
             <path d="M16 9C13 6 6 6.5 6 12.5C6.5 16 11 15 16 12" fill="#7C3AED" />
             <path d="M16 9C19 6 26 6.5 26 12.5C25.5 16 21 15 16 12" fill="#EC4899" />
@@ -110,42 +110,41 @@ export default function TaskList({ onEdit, searchQuery, onSearchChange, selected
   }
 
   return (
-    <div className="anim-slide-up h-full flex flex-col p-4">
-      {/* Section label */}
-      <div className="flex items-center gap-2.5 mb-3.5 px-1 shrink-0">
-        <svg className="w-[1rem] h-[1rem] text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <div className="anim-slide-up h-full flex flex-col p-3">
+      {/* 头部单行：标题 + 统计 + 搜索 + 排序。
+          原来是「标题行 + 工具栏行」两行，光头部就吃掉约 90px，任务区被挤得只剩几条。 */}
+      <div className="flex items-center gap-2.5 mb-2 px-1 shrink-0" title="拖拽任务可嵌套为子任务">
+        <svg className="w-[0.95rem] h-[0.95rem] text-violet-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" />
         </svg>
-        <h3 className="text-sm font-bold text-violet-800">任务列表</h3>
-        <div className="h-[0.9rem] w-px bg-violet-100/40" />
-        <span className="text-xs text-violet-300 font-medium">拖拽任务可嵌套为子任务</span>
-      </div>
+        <h3 className="text-sm font-bold text-violet-800 shrink-0">任务列表</h3>
+        <div className="h-[0.85rem] w-px bg-violet-100/40 shrink-0" />
 
-      {/* Stats + Search — taller row */}
-      <div className="flex items-center justify-between mb-4 px-1 shrink-0 gap-4" style={{ minHeight: '2.5rem' }}>
         {/* Stats */}
-        <div className="flex items-center gap-3 shrink-0">
-          <span className="text-xs text-violet-400 font-semibold">共 {totalAll} 项</span>
-          {todo > 0 && <span className="flex items-center gap-1.5 text-xs text-violet-500 font-medium"><span className="w-2.5 h-2.5 rounded-full bg-violet-200" />{todo}</span>}
-          {inProgress > 0 && <span className="flex items-center gap-1.5 text-xs text-violet-600 font-medium"><span className="w-2.5 h-2.5 rounded-full bg-violet-500" />{inProgress}</span>}
-          {doneAll > 0 && <span className="flex items-center gap-1.5 text-xs text-pink-600 font-medium"><span className="w-2.5 h-2.5 rounded-full bg-pink-400" />{doneAll}</span>}
+        <div className="flex items-center gap-2.5 shrink-0">
+          <span className="fs-2xs text-violet-400 font-semibold tabular-nums">共 {totalAll}</span>
+          {todo > 0 && <span className="flex items-center gap-1 fs-2xs text-violet-500 font-medium tabular-nums"><span className="w-2 h-2 rounded-full bg-violet-200" />{todo}</span>}
+          {inProgress > 0 && <span className="flex items-center gap-1 fs-2xs text-violet-600 font-medium tabular-nums"><span className="w-2 h-2 rounded-full bg-violet-500" />{inProgress}</span>}
+          {doneAll > 0 && <span className="flex items-center gap-1 fs-2xs text-pink-600 font-medium tabular-nums"><span className="w-2 h-2 rounded-full bg-pink-400" />{doneAll}</span>}
         </div>
 
+        <div className="flex-1" />
+
         {/* Search bar — icon on left, outside input */}
-        <div className="flex-1 max-w-[18rem] flex items-center gap-2 bg-violet-50/40 rounded-full px-3 py-2.5 border border-transparent focus-within:border-violet-200 focus-within:bg-white transition-all">
-          <svg className="w-[1rem] h-[1rem] text-violet-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <div className="w-[10rem] shrink-0 flex items-center gap-1.5 bg-violet-50/40 rounded-full px-2.5 py-1.5 border border-transparent focus-within:border-violet-200 focus-within:bg-white transition-all">
+          <svg className="w-[0.85rem] h-[0.85rem] text-violet-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="搜索任务…"
-            className="flex-1 bg-transparent text-xs text-violet-900 placeholder:text-violet-300 outline-none min-w-0"
+            placeholder="搜索…"
+            className="flex-1 bg-transparent fs-2xs text-violet-900 placeholder:text-violet-300 outline-none min-w-0"
           />
           {searchQuery && (
             <button onClick={() => onSearchChange('')} className="text-violet-300 hover:text-violet-500 shrink-0">
-              <svg className="w-[0.75rem] h-[0.75rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <svg className="w-[0.7rem] h-[0.7rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -155,8 +154,8 @@ export default function TaskList({ onEdit, searchQuery, onSearchChange, selected
         {/* Sort */}
         <div className="relative shrink-0">
           <button onClick={() => setShowSort(!showSort)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium text-violet-400 hover:text-violet-600 hover:bg-violet-50/50 transition-colors">
-            <svg className="w-[0.9rem] h-[0.9rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            className="flex items-center gap-1 px-2 py-1.5 rounded-full fs-2xs font-medium text-violet-400 hover:text-violet-600 hover:bg-violet-50/50 transition-colors">
+            <svg className="w-[0.8rem] h-[0.8rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
             </svg>
             {SORT_LABELS[sortBy]}
@@ -177,7 +176,8 @@ export default function TaskList({ onEdit, searchQuery, onSearchChange, selected
 
       {/* Task list */}
       <div
-        className={`flex-1 min-h-0 overflow-y-auto space-y-3 pr-1 transition-all duration-200 ${dragOverRoot ? 'ring-2 ring-violet-200 ring-offset-4 rounded-[20px]' : ''}`}
+        data-list="tasks"
+        className={`flex-1 min-h-0 overflow-y-auto space-y-1.5 pr-1 transition-all duration-200 ${dragOverRoot ? 'ring-2 ring-violet-200 ring-offset-4 rounded-[20px]' : ''}`}
         onDragOver={(e) => { e.preventDefault(); setDragOverRoot(true); }}
         onDragLeave={() => setDragOverRoot(false)}
         onDrop={handleRootDrop}
@@ -186,7 +186,7 @@ export default function TaskList({ onEdit, searchQuery, onSearchChange, selected
           <TaskNode key={task.id} task={task} depth={0} allTasks={activeTasks} onEdit={onEdit} selectedIds={selectedIds} onToggleSelect={onToggleSelect} />
         ))}
         {filteredRoots.length === 0 && searchQuery && (
-          <p className="text-sm text-violet-200 text-center py-12">没有找到匹配的任务</p>
+          <p className="fs-xs text-violet-200 text-center py-8">没有找到匹配的任务</p>
         )}
       </div>
     </div>
