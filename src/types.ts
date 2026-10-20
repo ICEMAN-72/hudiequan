@@ -9,10 +9,13 @@ export interface Task {
   startDate?: string;
   endDate?: string;
   createdAt: number;
+  /** 完成时刻。进入 done 时写入，离开 done 时清除。统计口径以此为准 */
+  finishedAt?: number;
   isTrashed?: boolean;
   notes?: string;
   recurrence?: 'none' | 'daily' | 'weekly' | 'monthly';
-  recurrenceId?: string;
+  /** 周期任务的身份标识：每个周期模板的所有历史实例共享同一个 templateId */
+  templateId?: string;
 }
 
 export type Quadrant = 'do' | 'schedule' | 'delegate' | 'eliminate';
@@ -20,6 +23,15 @@ export type TaskStatus = 'todo' | 'in_progress' | 'done';
 export type DateType = 'none' | 'point' | 'range';
 export type SortOption = 'default' | 'status' | 'created' | 'children' | 'category';
 export type RecurrenceType = 'none' | 'daily' | 'weekly' | 'monthly';
+
+/**
+ * 是否真的是周期任务。
+ * 注意：recurrence 字段可能是 'none'（旧数据迁移、编辑表单回写都会留下这个值），
+ * 所以不能用 `!task.recurrence` 判断 —— 'none' 是 truthy，会让普通任务凭空消失。
+ */
+export function isRecurringTask(task: Task): boolean {
+  return !!task.recurrence && task.recurrence !== 'none';
+}
 
 export function getQuadrant(task: Task): Quadrant {
   if (task.urgency === 'high' && task.importance === 'high') return 'do';

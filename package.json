@@ -1,14 +1,16 @@
 {
   "name": "hudiequan",
   "private": true,
-  "version": "0.0.0",
+  "version": "3.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "deploy": "npm run build && npx gh-pages -d dist"
+    "deploy": "npm run build && npx gh-pages -d dist",
+    "test": "node tests/date.test.mjs",
+    "shots": "node tools/screenshot.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.2",

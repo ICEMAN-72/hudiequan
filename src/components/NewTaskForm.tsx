@@ -132,11 +132,11 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
 
   return (
     <div
-      className="bg-white/95 backdrop-blur-sm rounded-[28px] shadow-warm-xl flex flex-col h-full anim-scale-in dew-highlight"
+      className="bg-white/97 backdrop-blur-xl rounded-[26px] shadow-warm-xl flex flex-col max-h-[calc(100vh-4rem)] overflow-hidden anim-sheet-in"
       onKeyDown={handleKeyDown}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-7 pt-7 pb-5 shrink-0">
+      <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F3E8FF 0%, #FCE7F3 100%)' }}>
             <svg className="w-5 h-5 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
@@ -158,7 +158,7 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
       </div>
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-7 pb-5 space-y-24">
+      <div className="flex-1 overflow-y-auto scroll-thin px-6 pb-4 space-y-3 overscroll-contain">
 
         {/* Title input */}
         <input
@@ -222,7 +222,7 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
         </div>
 
         {/* Module separator — soft dashed divider with floating dot */}
-        <div className="flex items-center justify-center gap-2.5 -my-12 opacity-60">
+        <div className="flex items-center justify-center gap-2.5 my-1 opacity-60">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-violet-200 to-violet-200" />
           <div className="flex items-center gap-1.5">
             <span className="w-1 h-1 rounded-full bg-violet-300" />
@@ -375,11 +375,11 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
         )}
 
         {/* Spacer */}
-        <div className="min-h-[1rem]" />
+        <div className="min-h-[0.5rem]" />
       </div>
 
       {/* Footer */}
-      <div className="px-7 pb-7 pt-4 shrink-0 border-t border-violet-50/50">
+      <div className="px-6 pb-6 pt-3.5 shrink-0 border-t border-violet-50/60">
         <button
           onClick={handleSave}
           disabled={!canSave}

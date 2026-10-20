@@ -36,11 +36,13 @@
   --fs-base: 18px;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/*
+ * 注意：这里绝对不能再写 `* { margin:0; padding:0 }` 这种无层级的全局重置。
+ * Tailwind v4 的 reset 已经在 @layer base 里做了同样的事，
+ * 而"无层级样式"的优先级高于任何 @layer —— 写了之后会把全部
+ * p-* / px-* / py-* / m-* / mt-* / space-y-* 工具类压成 0，
+ * 表现出来就是：面板没有内边距、文字紧贴圆角边缘、卡片彼此粘连。
+ */
 
 html {
   font-size: var(--fs-base);
@@ -234,13 +236,18 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
 .dark ::-webkit-scrollbar-thumb:hover { background: #5646A6; }
 /* Override Tailwind bg-white/transparent cards for dark */
 .dark .bg-white\/95 { background: rgba(30, 25, 50, 0.95) !important; }
+.dark .bg-white\/90 { background: rgba(30, 25, 50, 0.9) !important; }
 .dark .bg-white\/80 { background: rgba(35, 30, 55, 0.8) !important; }
 .dark .bg-white\/70 { background: rgba(40, 35, 60, 0.7) !important; }
-.dark .bg-white\/90 { background: rgba(30, 25, 50, 0.9) !important; }
+.dark .bg-white\/60 { background: rgba(34, 29, 54, 0.88) !important; }
+.dark .bg-white\/50 { background: rgba(40, 35, 62, 0.6) !important; }
+.dark .bg-white\/40 { background: rgba(40, 35, 62, 0.45) !important; }
+.dark .bg-white\/30 { background: rgba(60, 52, 90, 0.35) !important; }
 .dark .bg-white { background: #1E1932 !important; }
 .dark .border-violet-100\/60 { border-color: rgba(124, 58, 237, 0.15) !important; }
 .dark .border-violet-50\/40 { border-color: rgba(124, 58, 237, 0.08) !important; }
 .dark .border-violet-50\/50 { border-color: rgba(124, 58, 237, 0.1) !important; }
+.dark .border-violet-50\/60 { border-color: rgba(124, 58, 237, 0.1) !important; }
 .dark .from-violet-100\/20 { --tw-gradient-from: rgba(124, 58, 237, 0.04) !important; }
 .dark .via-violet-100\/40 { --tw-gradient-stops: rgba(124, 58, 237, 0.08) !important; }
 .dark .to-pink-100\/20 { --tw-gradient-to: rgba(236, 72, 153, 0.04) !important; }
@@ -254,11 +261,14 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
 .dark .text-violet-200 { color: #4A4078 !important; }
 .dark .text-pink-600 { color: #F472B6 !important; }
 .dark .text-pink-500 { color: #EC4899 !important; }
+.dark .text-pink-400 { color: #EC4899 !important; }
+.dark .text-pink-300 { color: #9D4E77 !important; }
 .dark .bg-violet-50\/30,
 .dark .bg-violet-50\/20,
 .dark .bg-violet-50\/40,
 .dark .bg-violet-50\/50 { background: rgba(124, 58, 237, 0.08) !important; }
 .dark .bg-pink-50\/40 { background: rgba(236, 72, 153, 0.08) !important; }
+.dark .bg-pink-50\/50 { background: rgba(236, 72, 153, 0.1) !important; }
 .dark .bg-pink-50\/80 { background: rgba(236, 72, 153, 0.12) !important; }
 .dark .bg-violet-50\/80 { background: rgba(124, 58, 237, 0.1) !important; }
 .dark .bg-orange-50\/80 { background: rgba(251, 146, 60, 0.1) !important; }
@@ -276,4 +286,209 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
 .dark .dew-highlight::before { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
 .dark .bg-violet-900\/15 { background: rgba(0, 0, 0, 0.4) !important; }
 .dark input[type="range"] { background: #2D2648; }
+
+/* ---- 深色模式补漏：teal / stone / orange / green / red / amber 色阶 ----
+   之前只覆盖了 violet 和 pink，周期任务面板（teal）、四象限的
+   stone/orange、存储柜的 green/red 在深色下全是刺眼白块。 */
+.dark .text-teal-700 { color: #5EEAD4 !important; }
+.dark .text-teal-600 { color: #2DD4BF !important; }
+.dark .text-teal-500 { color: #14B8A6 !important; }
+.dark .text-teal-400 { color: #0D9488 !important; }
+.dark .text-teal-300 { color: #0F766E !important; }
+.dark .bg-teal-50 { background: rgba(20, 184, 166, 0.12) !important; }
+.dark .bg-teal-50\/60 { background: rgba(20, 184, 166, 0.1) !important; }
+.dark .bg-teal-50\/80 { background: rgba(20, 184, 166, 0.14) !important; }
+.dark .bg-teal-100 { background: rgba(20, 184, 166, 0.2) !important; }
+.dark .hover\:bg-teal-100:hover { background: rgba(20, 184, 166, 0.22) !important; }
+.dark .border-teal-100\/60 { border-color: rgba(20, 184, 166, 0.18) !important; }
+
+.dark .text-stone-600 { color: #B9B4CB !important; }
+.dark .text-stone-500 { color: #9A94B2 !important; }
+.dark .text-stone-400 { color: #7E7896 !important; }
+.dark .bg-stone-50 { background: rgba(168, 164, 190, 0.1) !important; }
+.dark .bg-stone-50\/50 { background: rgba(168, 164, 190, 0.07) !important; }
+.dark .bg-stone-100 { background: rgba(168, 164, 190, 0.14) !important; }
+.dark .bg-stone-100\/70 { background: rgba(168, 164, 190, 0.14) !important; }
+.dark .border-stone-200\/60 { border-color: rgba(168, 164, 190, 0.16) !important; }
+
+.dark .text-orange-700 { color: #FDBA74 !important; }
+.dark .text-orange-600 { color: #FB923C !important; }
+.dark .text-orange-500 { color: #F97316 !important; }
+.dark .bg-orange-50 { background: rgba(251, 146, 60, 0.1) !important; }
+.dark .bg-orange-50\/50 { background: rgba(251, 146, 60, 0.08) !important; }
+.dark .bg-orange-100 { background: rgba(251, 146, 60, 0.18) !important; }
+.dark .bg-orange-100\/70 { background: rgba(251, 146, 60, 0.16) !important; }
+.dark .border-orange-100\/60 { border-color: rgba(251, 146, 60, 0.18) !important; }
+
+.dark .text-green-700 { color: #6EE7B7 !important; }
+.dark .text-green-600 { color: #34D399 !important; }
+.dark .text-green-500 { color: #10B981 !important; }
+.dark .bg-green-50 { background: rgba(52, 211, 153, 0.12) !important; }
+.dark .bg-green-50\/60 { background: rgba(52, 211, 153, 0.1) !important; }
+.dark .bg-green-100 { background: rgba(52, 211, 153, 0.18) !important; }
+
+.dark .text-red-600 { color: #FCA5A5 !important; }
+.dark .text-red-500 { color: #F87171 !important; }
+.dark .bg-red-50 { background: rgba(239, 68, 68, 0.12) !important; }
+.dark .bg-red-100 { background: rgba(239, 68, 68, 0.18) !important; }
+
+.dark .text-amber-700 { color: #FCD34D !important; }
+.dark .text-amber-600 { color: #FBBF24 !important; }
+.dark .bg-amber-50 { background: rgba(251, 191, 36, 0.12) !important; }
+.dark .bg-amber-100 { background: rgba(251, 191, 36, 0.18) !important; }
+.dark .border-amber-200\/60 { border-color: rgba(251, 191, 36, 0.2) !important; }
+
+.dark .bg-violet-100 { background: rgba(124, 58, 237, 0.18) !important; }
+.dark .bg-violet-100\/60 { background: rgba(124, 58, 237, 0.16) !important; }
+.dark .bg-violet-100\/70 { background: rgba(124, 58, 237, 0.18) !important; }
+.dark .bg-pink-100 { background: rgba(236, 72, 153, 0.18) !important; }
+.dark .bg-pink-100\/70 { background: rgba(236, 72, 153, 0.16) !important; }
+.dark .border-violet-100 { border-color: rgba(124, 58, 237, 0.16) !important; }
+.dark .border-violet-200\/30 { border-color: rgba(124, 58, 237, 0.14) !important; }
+.dark .border-violet-200\/40 { border-color: rgba(124, 58, 237, 0.16) !important; }
+.dark .border-pink-100\/60 { border-color: rgba(236, 72, 153, 0.16) !important; }
+.dark .ring-violet-200\/30 { --tw-ring-color: rgba(124, 58, 237, 0.2) !important; }
+.dark .ring-violet-300\/40 { --tw-ring-color: rgba(124, 58, 237, 0.28) !important; }
+.dark .ring-violet-300\/50 { --tw-ring-color: rgba(124, 58, 237, 0.32) !important; }
+.dark .divide-violet-50 > * + * { border-color: rgba(124, 58, 237, 0.1) !important; }
+.dark .surface-panel { background: rgba(32, 27, 50, 0.62) !important; }
+.dark .surface-card {
+  background: rgba(52, 45, 78, 0.92) !important;
+  border-color: rgba(124, 58, 237, 0.16) !important;
+}
+.dark .dialog-sheet { background: rgba(38, 32, 58, 0.98) !important; border-color: rgba(124, 58, 237, 0.18) !important; }
+.dark .text-ink { color: #E4DEF7 !important; }
+.dark .text-ink-soft { color: #A9A2C4 !important; }
+.dark .text-ink-muted { color: #7B7496 !important; }
+
+/* ==========================================================================
+   字号系统
+   html 的 font-size 绑定了 --fs-base，所以 rem 天然跟随设置缩放。
+   统一用 fs-* 语义类，禁止再写 text-[9px] 这类绝对像素。
+   ========================================================================== */
+.fs-2xs { font-size: 0.63rem; line-height: 1.25; }
+.fs-xs  { font-size: 0.75rem; line-height: 1.35; }
+.fs-sm  { font-size: 0.88rem; line-height: 1.45; }
+.fs-md  { font-size: 1rem;    line-height: 1.5; }
+.fs-lg  { font-size: 1.15rem; line-height: 1.45; }
+.fs-xl  { font-size: 1.38rem; line-height: 1.35; }
+
+/* ==========================================================================
+   呼出面板 —— 解决「内容被大圆角盖住」
+   关键是圆角在外层、内边距由 header/body 各自承担，
+   body 单独滚动，滚动内容永远不会顶到圆角上。
+   ========================================================================== */
+.dialog-sheet {
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(124, 58, 237, 0.10);
+  border-radius: 26px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 4rem);
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(124, 58, 237, 0.16), 0 8px 32px rgba(236, 72, 153, 0.10);
+}
+
+.dialog-header {
+  flex-shrink: 0;
+  padding: 1.5rem 1.6rem 1rem;
+}
+
+.dialog-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 1.6rem 1.6rem;
+}
+
+.dialog-footer {
+  flex-shrink: 0;
+  padding: 1rem 1.6rem 1.4rem;
+  border-top: 1px solid rgba(124, 58, 237, 0.07);
+}
+
+/* 面板表面 / 卡片表面
+   关键：面板必须比卡片「虚」，卡片才浮得起来。
+   之前两者都是 0.7/0.8 的白，视觉上粘成一片，任务卡看着像重叠。 */
+.surface-panel {
+  background: rgba(255, 255, 255, 0.46);
+  backdrop-filter: blur(10px);
+}
+.surface-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(124, 58, 237, 0.06);
+}
+
+/* 图标按钮 —— 统一按压反馈 */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: #A8A4BE;
+  transition: color 0.18s ease, background-color 0.18s ease, transform 0.12s ease;
+}
+.icon-btn:hover { color: #7C3AED; background: rgba(124, 58, 237, 0.07); }
+.icon-btn:active { transform: scale(0.92); }
+
+/* 细滚动条 —— 用在面板内部列表 */
+.scroll-thin { scrollbar-width: thin; }
+.scroll-thin::-webkit-scrollbar { width: 4px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: #DDD6FE; }
+
+/* ==========================================================================
+   动效 —— 呼出、遮罩、列表逐项进场
+   ========================================================================== */
+@keyframes backdrop-in {
+  from { opacity: 0; backdrop-filter: blur(0); }
+  to   { opacity: 1; backdrop-filter: blur(6px); }
+}
+@keyframes sheet-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes drawer-in {
+  from { opacity: 0; transform: translateX(28px) scale(0.98); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pop-in {
+  0%   { opacity: 0; transform: scale(0.9); }
+  60%  { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.anim-backdrop-in { animation: backdrop-in 0.22s ease-out both; }
+.anim-sheet-in    { animation: sheet-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-drawer-in   { animation: drawer-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-rise-in     { animation: rise-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-pop-in      { animation: pop-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+/* 列表逐项错峰进场，最多 8 项，避免长列表等待 */
+.stagger > * { animation: rise-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.stagger > *:nth-child(1) { animation-delay: 0.01s; }
+.stagger > *:nth-child(2) { animation-delay: 0.03s; }
+.stagger > *:nth-child(3) { animation-delay: 0.05s; }
+.stagger > *:nth-child(4) { animation-delay: 0.07s; }
+.stagger > *:nth-child(5) { animation-delay: 0.09s; }
+.stagger > *:nth-child(6) { animation-delay: 0.11s; }
+.stagger > *:nth-child(7) { animation-delay: 0.13s; }
+.stagger > *:nth-child(n+8) { animation-delay: 0.15s; }
+
+/* 尊重系统的减少动效偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .anim-backdrop-in,
+  .anim-sheet-in,
+  .anim-drawer-in,
+  .anim-rise-in,
+  .anim-pop-in,
+  .stagger > * {
+    animation: none !important;
+  }
+}
+
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTaskStore } from '../store/taskStore';
 import { useSettingsStore } from '../store/settingsStore';
 import type { Task, SortOption } from '../types';
+import { isRecurringTask } from '../types';
 import TaskNode from './TaskNode';
 
 interface TaskListProps {
@@ -23,7 +24,7 @@ const SORT_LABELS: Record<SortOption, string> = {
 const SORT_OPTIONS: SortOption[] = ['default', 'status', 'created', 'children', 'category'];
 
 function sortRootTasks(tasks: Task[], sortBy: SortOption): Task[] {
-  const roots = tasks.filter((t) => !t.parentId && !t.isTrashed && !t.recurrence);
+  const roots = tasks.filter((t) => !t.parentId && !t.isTrashed && !isRecurringTask(t));
   switch (sortBy) {
     case 'status': {
       const order: Record<Task['status'], number> = { in_progress: 0, todo: 1, done: 2 };
@@ -109,7 +110,7 @@ export default function TaskList({ onEdit, searchQuery, onSearchChange, selected
   }
 
   return (
-    <div className="anim-slide-up h-full flex flex-col">
+    <div className="anim-slide-up h-full flex flex-col p-4">
       {/* Section label */}
       <div className="flex items-center gap-2.5 mb-3.5 px-1 shrink-0">
         <svg className="w-[1rem] h-[1rem] text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

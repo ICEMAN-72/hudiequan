@@ -23,7 +23,8 @@ export interface TaskRow {
   end_date: string | null;
   notes: string | null;
   recurrence: string | null;
-  recurrence_id: string | null;
+  template_id: string | null;
+  finished_at: number | null;
   is_trashed: boolean;
   created_at: number | null;
   updated_at: string;
@@ -117,7 +118,8 @@ export function toRow(t: Task, userId: string): TaskRow {
     end_date: t.endDate ?? null,
     notes: t.notes ?? null,
     recurrence: t.recurrence ?? null,
-    recurrence_id: t.recurrenceId ?? null,
+    template_id: t.templateId ?? null,
+    finished_at: t.finishedAt ?? null,
     is_trashed: t.isTrashed === true,
     created_at: t.createdAt ?? Date.now(),
     updated_at: new Date().toISOString(),
@@ -140,7 +142,8 @@ export function fromRow(r: Partial<TaskRow>): Task {
   if (r.end_date) task.endDate = String(r.end_date);
   if (r.notes) task.notes = String(r.notes);
   if (r.recurrence && r.recurrence !== 'none') task.recurrence = r.recurrence as Task['recurrence'];
-  if (r.recurrence_id) task.recurrenceId = String(r.recurrence_id);
+  if (r.template_id) task.templateId = String(r.template_id);
+  if (r.finished_at != null) task.finishedAt = Number(r.finished_at);
   return task;
 }
 

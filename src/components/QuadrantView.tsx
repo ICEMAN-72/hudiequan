@@ -1,7 +1,7 @@
 import { useTaskStore } from '../store/taskStore';
 import { useSettingsStore } from '../store/settingsStore';
 import type { Task, Quadrant } from '../types';
-import { getQuadrant, QUADRANT_CONFIG } from '../types';
+import { getQuadrant, isRecurringTask, QUADRANT_CONFIG } from '../types';
 import QuadrantTaskCard from './QuadrantTaskCard';
 
 interface QuadrantViewProps {
@@ -44,7 +44,7 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
   };
 
   // Filter: non-trashed, optionally hide done
-  const visibleTasks = tasks.filter((t) => !t.isTrashed && !t.recurrence && (showCompleted || t.status !== 'done'));
+  const visibleTasks = tasks.filter((t) => !t.isTrashed && !isRecurringTask(t) && (showCompleted || t.status !== 'done'));
 
   const grouped: Record<Quadrant, Task[]> = {
     do: [], schedule: [], delegate: [], eliminate: [],
@@ -66,7 +66,7 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
   const totalCount = visibleTasks.filter((t) => !t.parentId).length;
 
   return (
-    <div className="h-full flex flex-col anim-slide-up">
+    <div className="h-full flex flex-col p-4 anim-slide-up">
       <div className="flex items-center gap-2.5 mb-3 shrink-0">
         <svg className="w-[1.2rem] h-[1.2rem] text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h16v16H4z M4 12h16 M12 4v16" />
@@ -99,9 +99,9 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
                 <p className={`text-xs mt-1.5 ${config.headerText} opacity-45`}>{config.subtitle}</p>
               </div>
 
-              <div className="p-2.5 flex-1 overflow-y-auto min-h-0">
+              <div className="p-3 space-y-2 flex-1 overflow-y-auto scroll-thin min-h-0">
                 {items.length === 0 ? (
-                  <div className="flex items-center justify-center h-full py-8"><span className="text-xs text-violet-200">—</span></div>
+                  <div className="flex items-center justify-center h-full py-8"><span className="fs-xs text-violet-200">—</span></div>
                 ) : (
                   items.map((task) => renderTree(task, 0, visibleTasks, onEdit, cycleStatus))
                 )}

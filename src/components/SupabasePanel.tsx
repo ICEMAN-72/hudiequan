@@ -13,6 +13,7 @@ import {
   pullFromCloud,
 } from '../lib/supabase';
 import { useTaskStore } from '../store/taskStore';
+import Modal from './ui/Modal';
 
 interface SupabasePanelProps {
   onClose: () => void;
@@ -164,56 +165,48 @@ export default function SupabasePanel({ onClose }: SupabasePanelProps) {
   };
 
   const inputCls =
-    'w-full px-4 py-3 rounded-[14px] text-sm text-violet-800 bg-violet-50/30 border-2 border-transparent focus:border-violet-200 focus:bg-white outline-none transition-colors placeholder:text-violet-300';
+    'w-full px-4 py-2.5 rounded-[14px] fs-xs text-violet-800 bg-violet-50/60 border border-violet-100 focus:border-violet-300 focus:bg-white focus:ring-2 focus:ring-violet-100 outline-none transition-all placeholder:text-violet-300';
+
+  const stepHint =
+    step === 'setup' ? '先接上 Supabase 项目' : step === 'auth' ? '登录后开始同步' : '已连接';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center anim-fade-in" onClick={onClose}>
-      <div className="absolute inset-0 bg-violet-900/15 backdrop-blur-sm" />
-      <div
-        className="relative z-10 w-[27rem] max-h-[88vh] overflow-y-auto bg-white/95 backdrop-blur-sm rounded-[24px] shadow-warm-xl p-7 anim-scale-in dew-highlight"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-teal-50">
-              <svg className="w-5 h-5 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-violet-900 leading-tight">云端同步</h3>
-              <p className="text-xs text-violet-400 mt-0.5">多设备任务同步</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full text-violet-300 hover:text-violet-500 hover:bg-violet-50/60">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
-
+    <Modal
+      onClose={onClose}
+      width="28rem"
+      title="云端同步"
+      subtitle={stepHint}
+      iconBg="linear-gradient(135deg, #ECFDF5 0%, #F0FDFA 100%)"
+      icon={
+        <svg className="w-5 h-5 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+        </svg>
+      }
+    >
+      <div className="space-y-3.5">
         {msg && (
-          <div className={`mb-5 px-4 py-3 rounded-[14px] text-sm leading-relaxed anim-fade-in ${tone[msg.type]}`}>
+          <div className={`px-3.5 py-2.5 rounded-[12px] fs-xs leading-relaxed anim-rise-in ${tone[msg.type]}`}>
             {msg.text}
           </div>
         )}
 
-        {step === 'loading' && <p className="text-sm text-violet-400 text-center py-6">读取中…</p>}
+        {step === 'loading' && <p className="fs-xs text-violet-400 text-center py-8">读取中…</p>}
 
         {/* ---------- 步骤 1：配置凭据 ---------- */}
         {step === 'setup' && (
-          <div className="space-y-4">
-            <div className="px-4 py-3 rounded-[14px] bg-amber-50 text-xs text-amber-700 leading-relaxed">
-              还没配置 Supabase 项目。去 supabase.com 建一个项目，然后在
+          <div className="space-y-3">
+            <div className="px-3.5 py-2.5 rounded-[12px] bg-amber-50 fs-2xs text-amber-700 leading-relaxed">
+              去 supabase.com 建一个项目，在
               <span className="font-semibold"> Settings → API </span>
               复制 Project URL 和 anon public key 填到下面。
             </div>
             <input value={cfgUrl} onChange={(e) => setCfgUrl(e.target.value)}
               placeholder="https://xxxxx.supabase.co" className={inputCls} />
             <textarea value={cfgKey} onChange={(e) => setCfgKey(e.target.value)}
-              placeholder="anon public key（一长串 eyJ… 开头的令牌）" rows={3}
-              className={inputCls + ' resize-none font-mono text-xs'} />
+              placeholder="anon public key（eyJ… 开头的长令牌）" rows={3}
+              className={inputCls + ' resize-none font-mono fs-2xs'} />
             <button onClick={handleSaveCredentials} disabled={busy || !cfgUrl || !cfgKey}
-              className="w-full py-3 rounded-full text-sm font-bold bg-violet-500 text-white disabled:opacity-30 hover:bg-violet-600 transition-colors">
+              className="w-full py-2.5 rounded-full fs-xs font-bold bg-violet-500 text-white disabled:opacity-30 hover:bg-violet-600 transition-colors">
               连接
             </button>
           </div>
@@ -221,23 +214,23 @@ export default function SupabasePanel({ onClose }: SupabasePanelProps) {
 
         {/* ---------- 步骤 2：登录 / 注册 ---------- */}
         {step === 'auth' && (
-          <div className="space-y-4">
-            <p className="text-sm text-violet-400 text-center">用邮箱注册或登录，任务会同步到云端</p>
+          <div className="space-y-3">
+            <p className="fs-xs text-violet-400 text-center">用邮箱注册或登录，任务会同步到云端</p>
             <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="邮箱" className={inputCls} />
             <input value={password} onChange={(e) => setPassword(e.target.value)} type="password"
               placeholder="密码（至少 6 位）" className={inputCls}
               onKeyDown={(e) => { if (e.key === 'Enter') handleLogin(); }} />
-            <div className="flex gap-3">
+            <div className="flex gap-2.5">
               <button onClick={handleLogin} disabled={busy || !email || !password}
-                className="flex-1 py-3 rounded-full text-sm font-bold bg-violet-500 text-white disabled:opacity-30 hover:bg-violet-600 transition-colors">
+                className="flex-1 py-2.5 rounded-full fs-xs font-bold bg-violet-500 text-white disabled:opacity-30 hover:bg-violet-600 transition-colors">
                 登录
               </button>
               <button onClick={handleRegister} disabled={busy || !email || !password}
-                className="flex-1 py-3 rounded-full text-sm font-bold bg-teal-500 text-white disabled:opacity-30 hover:bg-teal-600 transition-colors">
+                className="flex-1 py-2.5 rounded-full fs-xs font-bold bg-teal-500 text-white disabled:opacity-30 hover:bg-teal-600 transition-colors">
                 注册
               </button>
             </div>
-            <button onClick={handleReset} className="w-full py-2 text-xs text-violet-300 hover:text-violet-500 transition-colors">
+            <button onClick={handleReset} className="w-full py-1.5 fs-2xs text-violet-300 hover:text-violet-500 transition-colors">
               更换 Supabase 项目
             </button>
           </div>
@@ -245,43 +238,43 @@ export default function SupabasePanel({ onClose }: SupabasePanelProps) {
 
         {/* ---------- 步骤 3：已登录 ---------- */}
         {step === 'ready' && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 px-4 py-3 rounded-[14px] bg-teal-50">
-              <span className="w-2.5 h-2.5 rounded-full bg-teal-400 shrink-0" />
-              <span className="text-sm font-medium text-teal-700 truncate">{userEmail}</span>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-[12px] bg-teal-50">
+              <span className="w-2 h-2 rounded-full bg-teal-400 shrink-0" />
+              <span className="fs-xs font-medium text-teal-700 truncate">{userEmail}</span>
             </div>
 
-            <div className="flex items-center justify-between px-1 text-xs text-violet-400">
+            <div className="flex items-center justify-between px-1 fs-2xs text-violet-400">
               <span>本地任务</span>
               <span className="font-semibold text-violet-500">{tasks.length} 个</span>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2.5">
               <button onClick={handleUpload} disabled={busy}
-                className="flex-1 py-3 rounded-full text-sm font-bold bg-violet-50 text-violet-600 hover:bg-violet-100 disabled:opacity-40 transition-colors">
-                ↑ 上传到云端
+                className="flex-1 py-2.5 rounded-full fs-xs font-bold bg-violet-50 text-violet-600 hover:bg-violet-100 disabled:opacity-40 transition-colors">
+                ↑ 上传
               </button>
               <button onClick={handlePull} disabled={busy}
-                className="flex-1 py-3 rounded-full text-sm font-bold bg-teal-50 text-teal-600 hover:bg-teal-100 disabled:opacity-40 transition-colors">
-                ↓ 从云端拉取
+                className="flex-1 py-2.5 rounded-full fs-xs font-bold bg-teal-50 text-teal-600 hover:bg-teal-100 disabled:opacity-40 transition-colors">
+                ↓ 拉取
               </button>
             </div>
 
-            <p className="text-xs text-violet-300 text-center leading-relaxed px-2">
+            <p className="fs-2xs text-violet-300 text-center leading-relaxed px-1">
               上传会把本地完整镜像到云端（含删除）；拉取会用云端覆盖本地。
             </p>
 
-            <div className="flex gap-3 pt-1">
-              <button onClick={handleLogout} className="flex-1 py-2.5 rounded-full text-sm font-medium text-violet-400 hover:text-violet-600 hover:bg-violet-50/40 transition-colors">
+            <div className="flex gap-2.5 pt-0.5">
+              <button onClick={handleLogout} className="flex-1 py-2 rounded-full fs-2xs font-medium text-violet-400 hover:text-violet-600 hover:bg-violet-50/50 transition-colors">
                 登出
               </button>
-              <button onClick={handleReset} className="flex-1 py-2.5 rounded-full text-sm font-medium text-pink-400 hover:text-pink-600 hover:bg-pink-50/40 transition-colors">
+              <button onClick={handleReset} className="flex-1 py-2 rounded-full fs-2xs font-medium text-pink-400 hover:text-pink-600 hover:bg-pink-50/50 transition-colors">
                 更换项目
               </button>
             </div>
           </div>
         )}
       </div>
-    </div>
+    </Modal>
   );
 }
