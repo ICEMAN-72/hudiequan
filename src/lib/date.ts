@@ -72,13 +72,16 @@ export function timeToMinutes(hhmm: string): number {
  * - weekly  → 下周一
  * - monthly → 下月 1 号
  * 若 baseDate 已过期（早于今天），从今天起算，避免补出一串过期的历史实例。
+ *
+ * @param now 注入「今天」。默认取系统当天，传参仅供测试固定场景 ——
+ *            否则断言会随运行日期漂移（这天跑是绿的，改天就红了）。
  */
 export function nextOccurrence(
   recurrence: 'daily' | 'weekly' | 'monthly',
-  baseDate?: string
+  baseDate?: string,
+  now: string = todayStr()
 ): string {
-  const today = todayStr();
-  const anchor = baseDate && baseDate > today ? baseDate : today;
+  const anchor = baseDate && baseDate > now ? baseDate : now;
 
   if (recurrence === 'daily') {
     return addDaysStr(anchor, 1);

@@ -15,8 +15,21 @@ const HANDLE_KEY = 'backup-dir';
 const LAST_RUN_KEY = 'hudiequan-autobackup-last';
 const FOLDER_NAME_KEY = 'hudiequan-autobackup-folder';
 
+/**
+ * 自动备份全部写进用户选定目录下的这个子目录。
+ *
+ * 为什么不直接写在根目录：用户常把「手动导出的备份」「上个版本留下的旧文件」
+ * 也堆在同一个文件夹里。早期轮转清理是按文件名前缀 `蝴蝶泉-` 删旧的，
+ * 一旦用户自己的文件恰好也是这个前缀（比如 7 月那次导出），就会被当成过期快照清掉。
+ * 隔一层子目录之后，里面只有本程序写的文件，清理范围完全可控。
+ */
+const SUBDIR = '蝴蝶泉自动备份';
+
 /** 保留最近多少份备份 */
 export const KEEP_COUNT = 14;
+
+/** 只认自己写的文件名，别的绝不碰 */
+const AUTO_FILE_RE = /^蝴蝶泉-\d{8}-\d{4}\.json$/;
 
 export const supportsFileSystemAccess = (): boolean =>
   typeof window !== 'undefined' && 'showDirectoryPicker' in window;
@@ -75,6 +88,11 @@ type DirHandle = FileSystemDirectoryHandle & {
   values?: () => AsyncIterableIterator<FileSystemHandle>;
 };
 
+/** 拿到（必要时创建）存放快照的子目录 */
+async function openAutoDir(root: DirHandle): Promise<DirHandle> {
+  return (await root.getDirectoryHandle(SUBDIR, { create: true })) as DirHandle;
+}
+
 export async function pickBackupFolder(): Promise<string> {
   if (!supportsFileSystemAccess()) {
     throw new Error('当前浏览器不支持选择文件夹，请用 Chrome 或 Edge');
@@ -87,15 +105,19 @@ export async function pickBackupFolder(): Promise<string> {
   if (!perm) throw new Error('没有拿到写入权限');
 
   await idbSet(HANDLE_KEY, handle);
-  localStorage.setItem(FOLDER_NAME_KEY, handle.name);
-  return handle.name;
+  const label = `${handle.name}/${SUBDIR}`;
+  localStorage.setItem(FOLDER_NAME_KEY, label);
+  return label;
 }
 
 export async function getBackupFolderName(): Promise<string | null> {
   if (!supportsFileSystemAccess()) return null;
   const handle = await idbGet<DirHandle>(HANDLE_KEY);
   if (!handle) return null;
-  return localStorage.getItem(FOLDER_NAME_KEY) ?? handle.name ?? null;
+  const saved = localStorage.getItem(FOLDER_NAME_KEY);
+  // 老版本记的是父目录名，补上子目录后缀，界面显示才和磁盘一致
+  if (saved && saved.includes('/')) return saved;
+  return `${saved ?? handle.name}/${SUBDIR}`;
 }
 
 export async function forgetBackupFolder(): Promise<void> {
@@ -169,7 +191,8 @@ export async function backupNow(
   );
 
   try {
-    const fileHandle = await handle.getFileHandle(fileName, { create: true });
+    const dir = await openAutoDir(handle);
+    const fileHandle = await dir.getFileHandle(fileName, { create: true });
     const writable = await fileHandle.createWritable();
     await writable.write(body);
     await writable.close();
@@ -182,7 +205,8 @@ export async function backupNow(
 
   // 只保留最近 KEEP_COUNT 份，避免目录越堆越乱
   try {
-    await pruneOldBackups(handle);
+    const dir = await openAutoDir(handle);
+    await pruneOldBackups(dir);
   } catch {
     /* 清理失败不影响备份本身 */
   }
@@ -191,12 +215,13 @@ export async function backupNow(
   return { ok: true, message: '已备份', fileName, count: payload.tasks.length };
 }
 
-async function pruneOldBackups(handle: DirHandle): Promise<void> {
-  if (typeof handle.values !== 'function') return;
+async function pruneOldBackups(dir: DirHandle): Promise<void> {
+  if (typeof dir.values !== 'function') return;
 
   const names: string[] = [];
-  for await (const entry of handle.values()) {
-    if (entry.kind === 'file' && entry.name.startsWith('蝴蝶泉-') && entry.name.endsWith('.json')) {
+  for await (const entry of dir.values()) {
+    // 严格匹配「本程序写的文件名」，用户丢进来的任何东西都不在清理范围内
+    if (entry.kind === 'file' && AUTO_FILE_RE.test(entry.name)) {
       names.push(entry.name);
     }
   }
@@ -206,7 +231,7 @@ async function pruneOldBackups(handle: DirHandle): Promise<void> {
   const stale = names.slice(0, names.length - KEEP_COUNT);
   for (const name of stale) {
     try {
-      await handle.removeEntry(name);
+      await dir.removeEntry(name);
     } catch {
       /* ignore */
     }

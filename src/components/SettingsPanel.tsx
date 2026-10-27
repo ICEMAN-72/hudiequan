@@ -244,7 +244,7 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
         {/* 自动备份 */}
         <Card
           title="自动备份"
-          desc="每天一份 JSON 落到你自己的文件夹"
+          desc="写到选定目录的「蝴蝶泉自动备份」子目录"
           iconBg="linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)"
           icon={
             <svg className="w-5 h-5 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -276,7 +276,7 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
               </div>
               <div className="flex items-center justify-between gap-3 px-1">
                 <p className="fs-2xs text-violet-300 leading-relaxed">
-                  每次启动自动写一份，保留最近 14 份
+                  每次启动写一份，保留最近 14 份 · 目录里其它文件不会被动
                 </p>
                 <button onClick={disconnectFolder} className="fs-2xs text-violet-400 hover:text-pink-500 shrink-0 transition-colors">
                   断开
