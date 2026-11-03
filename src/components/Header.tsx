@@ -90,7 +90,7 @@ export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpC
           </button>
           <button
             onClick={onCalendarClick}
-            className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
+            className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-blue-500 hover:text-blue-700 hover:bg-blue-50/60 transition-colors"
             title="日历">
             <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z" />

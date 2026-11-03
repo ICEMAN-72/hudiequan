@@ -342,6 +342,20 @@ const tasks = [
 ];
 
 const seedTasks = JSON.stringify({ state: { tasks, sortBy: 'default' }, version: 5 });
+const seedNotes = JSON.stringify({
+  state: {
+    notes: [
+      { id: 'n1', text: '报销 8 月发票（还有 3 张没收齐）', createdAt: now - 3600000 },
+      { id: 'n2', text: '买洗衣液、洗面奶', createdAt: now - 7200000 },
+      { id: 'n3', text: '加班 3.5h，记得调休', createdAt: now - 86400000 },
+      { id: 'n4', text: '周四前把体检报告发给人事', createdAt: now - 172800000 },
+      { id: 'n5', text: '雨伞落在实验室了', createdAt: now - 259200000 },
+      { id: 'n6', text: '给导师带一盒月饼', createdAt: now - 345600000 },
+      { id: 'n7', text: '查一下宽带续费时间', createdAt: now - 432000000, done: true },
+    ],
+  },
+  version: 1,
+});
 const seedLight = JSON.stringify({ state: { fontSize: 18, showCompleted: true, darkMode: false, reviewEnabled: true, reviewTime: '17:30', autoBackupEnabled: false }, version: 0 });
 const seedDark = JSON.stringify({ state: { fontSize: 18, showCompleted: true, darkMode: true, reviewEnabled: true, reviewTime: '17:30', autoBackupEnabled: false }, version: 0 });
 
@@ -350,6 +364,7 @@ await send('Page.navigate', { url: APP });
 await sleep(1500);
 await evalJs(`
   localStorage.setItem('hudiequan-tasks', ${JSON.stringify(seedTasks)});
+  localStorage.setItem('hudiequan-notes', ${JSON.stringify(seedNotes)});
   localStorage.setItem('hudiequan-settings', ${JSON.stringify(seedLight)});
   localStorage.setItem('hudiequan-review-fired', String(new Date().toDateString()));
   'ok'
@@ -443,6 +458,7 @@ await reload(false);
 await sleep(600);
 console.log('open-calendar:', await clickByText('日历'));
 await sleep(800);
+await shot('09-calendar-month');
 console.log('calendar-day:', await clickByText('日'));
 await sleep(700);
 await shot('09-calendar-day');
@@ -458,13 +474,47 @@ await shot('11-ideas');
 await closeModal();
 await sleep(300);
 
-// 局部放大：任务列表 / 四象限
+// 局部放大：按标题找到所属 tile 再截，避免布局一改坐标就失效
+async function shotTile(name, heading) {
+  const rect = await evalJs(`(() => {
+    const h = [...document.querySelectorAll('h2,h3')].find((x) => x.textContent.trim().startsWith(${JSON.stringify(heading)}));
+    const tile = h && h.closest('section');
+    if (!tile) return null;
+    const r = tile.getBoundingClientRect();
+    return {
+      x: Math.max(0, Math.round(r.x)),
+      y: Math.max(0, Math.round(r.y)),
+      width: Math.round(r.width),
+      height: Math.round(r.height),
+    };
+  })()`);
+  if (!rect) {
+    console.log('  skip', name, '（找不到标题：' + heading + '）');
+    return;
+  }
+  await shot(name, rect);
+}
+
 await reload(false);
 await sleep(900);
-await shot('z1-tasklist', { x: 0, y: 30, width: 530, height: 310 });
-await shot('z2-quadrant', { x: 530, y: 30, width: 1150, height: 305 });
-await shot('z3-recurring', { x: 0, y: 345, width: 530, height: 220 });
+await shotTile('z1-tasklist', '任务列表');
+await shotTile('z2-quadrant', '四象限');
+await shotTile('z3-recurring', '周期任务');
 await shot('z4-header', { x: 500, y: 0, width: 1180, height: 32 });
+
+// 点开周期任务方块 → 下方子任务区
+const boxRect = await evalJs(`(() => {
+  const h = [...document.querySelectorAll('h3')].find((x) => x.textContent.trim().startsWith('周期任务'));
+  const tile = h && h.closest('section');
+  const box = tile && tile.querySelector('[role="button"]');
+  if (!box) return null;
+  box.click();
+  return true;
+})()`);
+if (boxRect) {
+  await sleep(500);
+  await shotTile('z6-recurring-open', '周期任务');
+}
 
 // 设置面板局部（检查圆角裁切）
 console.log(await clickByText('设置'));

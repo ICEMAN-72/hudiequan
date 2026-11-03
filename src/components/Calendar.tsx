@@ -72,26 +72,26 @@ export default function Calendar({ plain = false }: { plain?: boolean }) {
       <div className="flex items-center justify-between mb-3.5 shrink-0 gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
           {!plain && (
-            <svg className="w-[1.15rem] h-[1.15rem] text-violet-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-[1.15rem] h-[1.15rem] text-blue-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" />
             </svg>
           )}
-          <h3 className="fs-sm font-bold text-violet-800 truncate">{title}</h3>
+          <h3 className="fs-sm font-bold text-blue-800 truncate">{title}</h3>
           <button
             onClick={() => setCurrentDate(new Date())}
-            className="fs-xs text-violet-500 hover:text-violet-700 font-semibold px-2.5 py-1 rounded-full hover:bg-violet-50/40 transition-colors shrink-0"
+            className="fs-xs text-blue-500 hover:text-blue-700 font-semibold px-2.5 py-1 rounded-full hover:bg-blue-50/40 transition-colors shrink-0"
           >
             今天
           </button>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="flex bg-violet-50/50 rounded-full p-0.5">
+          <div className="flex bg-blue-50/50 rounded-full p-0.5">
             {(['month', 'week', 'day'] as ViewMode[]).map((v) => (
               <button
                 key={v}
                 onClick={() => setView(v)}
                 className={`px-2.5 py-0.5 rounded-full fs-xs font-semibold transition-all duration-200 ${
-                  view === v ? 'bg-white text-violet-700 shadow-warm' : 'text-violet-400 hover:text-violet-600'
+                  view === v ? 'bg-white text-blue-700 shadow-warm' : 'text-blue-400 hover:text-blue-600'
                 }`}
               >
                 {VIEW_LABEL[v]}
@@ -110,8 +110,8 @@ export default function Calendar({ plain = false }: { plain?: boolean }) {
       {/* 日视图 —— 当日任务清单（按时间属性排序，不再假造 24 小时轴） */}
       {view === 'day' && (
         <div className="flex-1 min-h-0 flex flex-col">
-          <div className="flex items-center gap-3 pb-2.5 mb-1 border-b border-violet-50/60 shrink-0">
-            <span className="fs-xs text-violet-400">
+          <div className="flex items-center gap-3 pb-2.5 mb-1 border-b border-blue-50/60 shrink-0">
+            <span className="fs-xs text-blue-400">
               {dayTaskList.length === 0
                 ? '这一天没有安排'
                 : `${dayTaskList.length} 个安排 · 已完成 ${dayTaskList.filter((t) => t.status === 'done').length}`}
@@ -120,12 +120,12 @@ export default function Calendar({ plain = false }: { plain?: boolean }) {
           <div className="flex-1 min-h-0 overflow-y-auto scroll-thin space-y-1.5 pt-2 pr-1">
             {dayTaskList.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center gap-1.5 py-8">
-                <div className="w-10 h-10 rounded-full bg-violet-50/60 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-violet-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <div className="w-10 h-10 rounded-full bg-blue-50/60 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6M9 8h6" /><circle cx="12" cy="12" r="9" />
                   </svg>
                 </div>
-                <p className="fs-xs text-violet-300">空着的一天，挺好</p>
+                <p className="fs-xs text-blue-300">空着的一天，挺好</p>
               </div>
             )}
             {dayTaskList.map((t) => {
@@ -141,12 +141,12 @@ export default function Calendar({ plain = false }: { plain?: boolean }) {
                 >
                   <span className="w-[3px] self-stretch rounded-full shrink-0" style={{ background: q.accent }} />
                   <div className="flex-1 min-w-0">
-                    <p className={`fs-xs font-semibold text-violet-800 truncate ${t.status === 'done' ? 'line-through' : ''}`}>{t.title}</p>
-                    <p className="fs-2xs text-violet-400 mt-0.5">
+                    <p className={`fs-xs font-semibold text-blue-800 truncate ${t.status === 'done' ? 'line-through' : ''}`}>{t.title}</p>
+                    <p className="fs-2xs text-blue-400 mt-0.5">
                       {isRange
                         ? `${formatDateDisplay(t.startDate!)} – ${formatDateDisplay(t.endDate!)} · 共 ${spanDays} 天`
                         : '当天'}
-                      {t.status === 'in_progress' && <span className="ml-1.5 text-violet-500">· 进行中</span>}
+                      {t.status === 'in_progress' && <span className="ml-1.5 text-blue-500">· 进行中</span>}
                     </p>
                   </div>
                 </div>
@@ -169,12 +169,12 @@ export default function Calendar({ plain = false }: { plain?: boolean }) {
               <div
                 key={i}
                 className={`flex flex-col rounded-[12px] p-1.5 min-w-0 transition-colors duration-200 ${
-                  isToday ? 'bg-violet-50/60 ring-1 ring-violet-200/40' : 'hover:bg-violet-50/20'
+                  isToday ? 'bg-blue-50/60 ring-1 ring-blue-200/40' : 'hover:bg-blue-50/20'
                 }`}
               >
                 <div className="text-center mb-1.5 shrink-0">
-                  <span className="fs-2xs text-violet-400">{WEEKDAYS[i]}</span>
-                  <div className={`fs-xs font-bold tabular-nums ${isToday ? 'text-violet-700' : 'text-violet-600'}`}>{d.getDate()}</div>
+                  <span className="fs-2xs text-blue-400">{WEEKDAYS[i]}</span>
+                  <div className={`fs-xs font-bold tabular-nums ${isToday ? 'text-blue-700' : 'text-blue-600'}`}>{d.getDate()}</div>
                 </div>
                 <div className="flex-1 space-y-1 overflow-y-auto scroll-thin min-h-0">
                   {dayTasks.map((t) => {
@@ -204,7 +204,7 @@ export default function Calendar({ plain = false }: { plain?: boolean }) {
         <>
           <div className="grid grid-cols-7 gap-1.5 mb-1 shrink-0">
             {WEEKDAYS.map((wd, i) => (
-              <div key={wd} className={`text-center fs-xs font-semibold py-1 ${i >= 5 ? 'text-pink-300' : 'text-violet-400'}`}>{wd}</div>
+              <div key={wd} className={`text-center fs-xs font-semibold py-1 ${i >= 5 ? 'text-blue-300' : 'text-blue-400'}`}>{wd}</div>
             ))}
           </div>
           <div className="flex-1 min-h-0 grid grid-cols-7 gap-1.5" style={{ gridTemplateRows: 'repeat(6, 1fr)' }}>
@@ -225,13 +225,13 @@ export default function Calendar({ plain = false }: { plain?: boolean }) {
                   title={hasAny ? dayTasks.map((t) => t.title).join(' · ') : undefined}
                   className={`relative rounded-[10px] transition-all duration-200 flex flex-col items-center justify-start pt-1.5 pb-1 px-1 overflow-hidden ${
                     isToday
-                      ? 'bg-violet-100/70 ring-1 ring-violet-300/50'
+                      ? 'bg-blue-100/70 ring-1 ring-blue-300/50'
                       : isHovered && hasAny
-                      ? 'bg-violet-50/50'
-                      : 'hover:bg-violet-50/25'
+                      ? 'bg-blue-50/50'
+                      : 'hover:bg-blue-50/25'
                   }`}
                 >
-                  <span className={`fs-xs font-semibold tabular-nums shrink-0 ${isToday ? 'text-violet-700' : i % 7 >= 5 ? 'text-pink-400' : 'text-violet-600'}`}>
+                  <span className={`fs-xs font-semibold tabular-nums shrink-0 ${isToday ? 'text-blue-700' : i % 7 >= 5 ? 'text-blue-300' : 'text-blue-600'}`}>
                     {day}
                   </span>
 
@@ -269,23 +269,23 @@ export default function Calendar({ plain = false }: { plain?: boolean }) {
                           />
                         );
                       })}
-                      {points.length > 4 && <span className="fs-2xs text-violet-400 leading-none">+{points.length - 4}</span>}
+                      {points.length > 4 && <span className="fs-2xs text-blue-400 leading-none">+{points.length - 4}</span>}
                     </div>
                   )}
                 </div>
               );
             })}
           </div>
-          <div className="flex items-center gap-3 mt-2.5 pt-2 border-t border-violet-50/60 shrink-0 flex-wrap">
+          <div className="flex items-center gap-3 mt-2.5 pt-2 border-t border-blue-50/60 shrink-0 flex-wrap">
             {(['do', 'schedule', 'delegate', 'eliminate'] as const).map((q) => (
               <div key={q} className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full" style={{ background: QUADRANT_CONFIG[q].accent }} />
-                <span className="fs-2xs text-violet-400">{QUADRANT_CONFIG[q].label}</span>
+                <span className="fs-2xs text-blue-400">{QUADRANT_CONFIG[q].label}</span>
               </div>
             ))}
             <div className="ml-auto flex items-center gap-3">
-              <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-violet-400" /><span className="fs-2xs text-violet-400">时间点</span></div>
-              <div className="flex items-center gap-1.5"><span className="w-3 h-[3px] rounded-full bg-violet-400" /><span className="fs-2xs text-violet-400">时间段</span></div>
+              <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-400" /><span className="fs-2xs text-blue-400">时间点</span></div>
+              <div className="flex items-center gap-1.5"><span className="w-3 h-[3px] rounded-full bg-blue-400" /><span className="fs-2xs text-blue-400">时间段</span></div>
             </div>
           </div>
         </>

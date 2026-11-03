@@ -186,17 +186,18 @@ function App() {
       {showCalendar && (
         <Modal
           onClose={() => setShowCalendar(false)}
-          width="54rem"
+          width="58rem"
+          tone="panel"
           title="日历"
           subtitle="按月看分布，点某天看当天要做什么"
-          iconBg="linear-gradient(135deg, #EDE9FE 0%, #FCE7F3 100%)"
+          iconBg="linear-gradient(135deg, #DBEAFE 0%, #E0F2FE 100%)"
           icon={
-            <svg className="w-[1.15rem] h-[1.15rem] text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-[1.15rem] h-[1.15rem] text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z" />
             </svg>
           }
         >
-          <div style={{ height: 'min(66vh, 34rem)' }}>
+          <div style={{ height: 'min(64vh, 33rem)' }}>
             <Calendar plain />
           </div>
         </Modal>

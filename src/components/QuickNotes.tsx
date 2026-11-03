@@ -80,7 +80,7 @@ export default function QuickNotes({ onClose }: QuickNotesProps) {
     return (
       <li
         key={note.id}
-        className={`group flex items-start gap-2 px-2.5 py-2 rounded-[10px] surface-card transition-all duration-200 ${
+        className={`group flex items-start gap-2 px-2.5 py-2.5 rounded-[10px] surface-card shadow-warm transition-all duration-200 ${
           note.done ? 'opacity-45' : ''
         }`}
       >
@@ -108,12 +108,12 @@ export default function QuickNotes({ onClose }: QuickNotesProps) {
               if (e.key === 'Enter') commitEdit();
               if (e.key === 'Escape') setEditingId(null);
             }}
-            className="flex-1 min-w-0 fs-xs bg-transparent border-b border-amber-300 outline-none text-amber-900 py-0.5"
+            className="flex-1 min-w-0 fs-sm bg-transparent border-b border-amber-300 outline-none text-amber-900 py-0.5"
           />
         ) : (
           <div className="flex-1 min-w-0">
             <p
-              className={`fs-xs leading-snug break-words cursor-text ${
+              className={`fs-sm leading-snug break-words cursor-text ${
                 note.done ? 'line-through text-amber-400' : 'text-amber-900'
               }`}
               onDoubleClick={() => {
@@ -157,7 +157,9 @@ export default function QuickNotes({ onClose }: QuickNotesProps) {
   return (
     <Modal
       onClose={onClose}
-      width="26rem"
+      width="52rem"
+      tone="panel"
+      bodyClassName="min-h-[22rem]"
       title="灵感"
       subtitle={`${countActiveNotes(notes)} 条待处理 · 灵光一现，先扔这儿`}
       iconBg="linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)"
@@ -185,12 +187,12 @@ export default function QuickNotes({ onClose }: QuickNotesProps) {
               if (e.key === 'Enter') submit();
             }}
             placeholder="买洗衣液、报销 8 月发票、周五交周报…"
-            className="flex-1 fs-xs px-3 py-2 rounded-[10px] bg-white/80 border border-amber-200/70 outline-none focus:border-amber-400 text-amber-900 placeholder:text-amber-300"
+            className="flex-1 fs-sm px-3.5 py-2.5 rounded-[10px] bg-white/80 border border-amber-200/70 outline-none focus:border-amber-400 text-amber-900 placeholder:text-amber-300"
           />
           <button
             onClick={submit}
             disabled={!draft.trim()}
-            className="shrink-0 px-3 py-2 rounded-[10px] fs-xs font-semibold text-white transition-all duration-200 active:scale-95 disabled:opacity-40"
+            className="shrink-0 px-4 py-2.5 rounded-[10px] fs-sm font-semibold text-white transition-all duration-200 active:scale-95 disabled:opacity-40"
             style={{ background: 'linear-gradient(135deg, #F59E0B 0%, #EC4899 100%)' }}
           >
             记下
@@ -198,8 +200,8 @@ export default function QuickNotes({ onClose }: QuickNotesProps) {
         </div>
 
         {active.length === 0 && finished.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 gap-2">
-            <svg className="w-9 h-9 text-amber-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.4}>
+          <div className="flex flex-col items-center justify-center py-14 gap-2">
+            <svg className="w-10 h-10 text-amber-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.4}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l1.7 4.6 4.6 1.7-4.6 1.7L12 15.6l-1.7-4.6L5.7 9.3l4.6-1.7L12 3z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z" />
             </svg>
@@ -208,12 +210,14 @@ export default function QuickNotes({ onClose }: QuickNotesProps) {
           </div>
         ) : (
           <>
-            {active.length > 0 && <ul className="space-y-1.5">{active.map(renderItem)}</ul>}
+            {active.length > 0 && (
+              <ul className="grid grid-cols-2 gap-2 items-start">{active.map(renderItem)}</ul>
+            )}
 
             {finished.length > 0 && (
               <div className="pt-1">
                 <p className="fs-2xs text-amber-400 px-1 mb-1.5">已处理 {finished.length}</p>
-                <ul className="space-y-1.5">{finished.map(renderItem)}</ul>
+                <ul className="grid grid-cols-2 gap-2 items-start">{finished.map(renderItem)}</ul>
               </div>
             )}
           </>

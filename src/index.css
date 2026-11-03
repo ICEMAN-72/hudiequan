@@ -285,6 +285,7 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
 .dark .hover\:bg-pink-100:hover { background: rgba(236, 72, 153, 0.15) !important; }
 .dark .dew-highlight::before { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
 .dark .bg-violet-900\/15 { background: rgba(0, 0, 0, 0.4) !important; }
+.dark .bg-violet-900\/18 { background: rgba(0, 0, 0, 0.46) !important; }
 .dark input[type="range"] { background: #2D2648; }
 
 /* ---- 深色模式补漏：teal / stone / orange / green / red / amber 色阶 ----
@@ -396,44 +397,27 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
 .dark .text-pink-800 { color: #FBCFE8 !important; }
 .dark .text-teal-200 { color: #99F6E4 !important; }
 
-/* ---- 深色模式补漏（第二轮，按「用到但没覆盖」扫出来的清单） ----
-   原则：浅色底在深色下必须压成半透明深色，
-   浅底上的深字必须翻成亮字，否则要么刺眼要么看不见。 */
-.dark .bg-violet-50\/25 { background: rgba(124, 58, 237, 0.05) !important; }
-.dark .bg-violet-50\/35 { background: rgba(124, 58, 237, 0.07) !important; }
-.dark .bg-violet-50\/70 { background: rgba(124, 58, 237, 0.12) !important; }
-.dark .bg-violet-100\/40 { background: rgba(124, 58, 237, 0.12) !important; }
-.dark .bg-violet-200 { background: rgba(124, 58, 237, 0.26) !important; }
-.dark .bg-violet-300 { background: rgba(139, 92, 246, 0.38) !important; }
-.dark .bg-amber-50\/95 { background: rgba(120, 80, 20, 0.55) !important; }
-.dark .bg-pink-50\/95 { background: rgba(120, 40, 80, 0.55) !important; }
-
-.dark .border-violet-100\/40 { border-color: rgba(124, 58, 237, 0.16) !important; }
-.dark .border-violet-100\/70 { border-color: rgba(124, 58, 237, 0.2) !important; }
-.dark .border-violet-200 { border-color: rgba(124, 58, 237, 0.26) !important; }
-.dark .border-violet-200\/50 { border-color: rgba(124, 58, 237, 0.24) !important; }
-.dark .border-violet-300 { border-color: rgba(124, 58, 237, 0.38) !important; }
-.dark .border-violet-400 { border-color: rgba(139, 92, 246, 0.55) !important; }
-.dark .border-violet-500 { border-color: rgba(139, 92, 246, 0.7) !important; }
-.dark .border-pink-100\/30 { border-color: rgba(236, 72, 153, 0.14) !important; }
-.dark .border-pink-200 { border-color: rgba(236, 72, 153, 0.24) !important; }
-.dark .border-pink-300 { border-color: rgba(236, 72, 153, 0.38) !important; }
-.dark .border-teal-100\/50 { border-color: rgba(20, 184, 166, 0.18) !important; }
-.dark .border-teal-200 { border-color: rgba(20, 184, 166, 0.26) !important; }
-.dark .border-amber-200 { border-color: rgba(251, 191, 36, 0.32) !important; }
-
-.dark .ring-violet-50 { --tw-ring-color: rgba(124, 58, 237, 0.16) !important; }
-.dark .ring-violet-100 { --tw-ring-color: rgba(124, 58, 237, 0.24) !important; }
-.dark .ring-violet-200 { --tw-ring-color: rgba(124, 58, 237, 0.3) !important; }
-.dark .ring-violet-200\/40 { --tw-ring-color: rgba(124, 58, 237, 0.26) !important; }
-.dark .ring-violet-300 { --tw-ring-color: rgba(124, 58, 237, 0.42) !important; }
-.dark .ring-violet-400 { --tw-ring-color: rgba(139, 92, 246, 0.6) !important; }
-.dark .ring-pink-50 { --tw-ring-color: rgba(236, 72, 153, 0.16) !important; }
-
-.dark .text-amber-800 { color: #FCD34D !important; }
-.dark .text-pink-700 { color: #F9A8D4 !important; }
-.dark .text-pink-800 { color: #FBCFE8 !important; }
-.dark .text-teal-200 { color: #99F6E4 !important; }
+/* ---- 日历：蓝色系深色覆盖（v3.6 起日历从紫色改为蓝色） ---- */
+.dark .text-blue-800 { color: #BFDBFE !important; }
+.dark .text-blue-700 { color: #93C5FD !important; }
+.dark .text-blue-600 { color: #60A5FA !important; }
+.dark .text-blue-500 { color: #3B82F6 !important; }
+.dark .text-blue-400 { color: #5B7CA8 !important; }
+.dark .text-blue-300 { color: #3E5A7E !important; }
+.dark .bg-blue-50 { background: rgba(59, 130, 246, 0.12) !important; }
+.dark .bg-blue-50\/60 { background: rgba(59, 130, 246, 0.1) !important; }
+.dark .bg-blue-50\/50 { background: rgba(59, 130, 246, 0.1) !important; }
+.dark .bg-blue-50\/25 { background: rgba(59, 130, 246, 0.06) !important; }
+.dark .bg-blue-50\/20 { background: rgba(59, 130, 246, 0.06) !important; }
+.dark .bg-blue-100 { background: rgba(59, 130, 246, 0.18) !important; }
+.dark .bg-blue-100\/70 { background: rgba(59, 130, 246, 0.18) !important; }
+.dark .border-blue-50\/60 { border-color: rgba(59, 130, 246, 0.16) !important; }
+.dark .ring-blue-300\/50 { --tw-ring-color: rgba(96, 165, 250, 0.4) !important; }
+.dark .ring-blue-200\/40 { --tw-ring-color: rgba(96, 165, 250, 0.28) !important; }
+.dark .hover\:bg-blue-50\/20:hover { background: rgba(59, 130, 246, 0.06) !important; }
+.dark .hover\:bg-blue-50\/25:hover { background: rgba(59, 130, 246, 0.08) !important; }
+.dark .hover\:bg-blue-50\/40:hover { background: rgba(59, 130, 246, 0.1) !important; }
+.dark .hover\:bg-blue-50\/60:hover { background: rgba(59, 130, 246, 0.12) !important; }
 
 .dark .text-ink { color: #E4DEF7 !important; }
 .dark .text-ink-soft { color: #A9A2C4 !important; }
@@ -493,6 +477,31 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
   border-top: 1px solid rgba(124, 58, 237, 0.07);
 }
 
+/* --------------------------------------------------------------------------
+   面板型呼出（灵感 / 日历）
+   这两块的内容本身就是「一整块面板」，不是临时浮层。所以外壳直接沿用
+   主界面 .tile 的材质：实色纸 + 20px 圆角 + 极轻阴影，不做背景模糊。
+   玻璃质感会让它们永远像「飘在上面」，和四象限、任务列表不像同一套东西。
+   -------------------------------------------------------------------------- */
+.dialog-sheet.dialog-panel {
+  /* 不能太靠近纯白：里面的便签卡是 #FFFFFF，
+     两者差 2% 明度时卡片完全看不出边界，整块面板会糊成一张纸。 */
+  background: #F6F3FC;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid rgba(124, 58, 237, 0.09);
+  border-radius: 20px;
+  max-height: calc(100vh - 3rem);
+  /* 没有模糊之后，阴影是唯一的高度来源，得比浮层版更实一点 */
+  box-shadow:
+    0 18px 50px rgba(124, 58, 237, 0.16),
+    0 4px 14px rgba(236, 72, 153, 0.07);
+}
+.dark .dialog-sheet.dialog-panel {
+  background: #211C33 !important;
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
 /* 面板表面 / 卡片表面
    关键：面板必须比卡片「虚」，卡片才浮得起来。
    之前两者都是 0.7/0.8 的白，视觉上粘成一片，任务卡看着像重叠。 */
@@ -529,6 +538,32 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
 }
 .dark .tile-major {
   background: rgba(38, 32, 58, 0.82);
+}
+
+/* 周期任务方块 —— 小方块网格，取代原来的横条卡片。
+   底色必须在这里定义：surface-card 是无层级样式，
+   bg-teal-50 这类工具类压不过它，选中态会「点上去没反应」。 */
+.rec-tile {
+  background: #FFFFFF;
+  border: 1px solid rgba(124, 58, 237, 0.06);
+}
+.rec-tile:hover {
+  background: #FDFCFF;
+}
+.rec-tile-active {
+  background: linear-gradient(0deg, rgba(20, 184, 166, 0.08), rgba(20, 184, 166, 0.08)), #FFFFFF;
+  border-color: rgba(20, 184, 166, 0.3);
+}
+.dark .rec-tile {
+  background: rgba(58, 49, 92, 0.96);
+  border-color: rgba(124, 58, 237, 0.2);
+}
+.dark .rec-tile:hover {
+  background: rgba(66, 56, 104, 0.98);
+}
+.dark .rec-tile-active {
+  background: linear-gradient(0deg, rgba(20, 184, 166, 0.16), rgba(20, 184, 166, 0.16)), rgba(58, 49, 92, 0.96);
+  border-color: rgba(20, 184, 166, 0.34);
 }
 
 /* 速记入口 —— 全站唯一用琥珀色的东西，所以必须自己带深色态。

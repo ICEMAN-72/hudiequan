@@ -1,6 +1,11 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 
 type Align = 'center' | 'right';
+/**
+ * sheet = 玻璃浮层（临时操作，如新建任务）
+ * panel = 实色面板（内容本身就是一整块模块，如灵感、日历），不做背景模糊
+ */
+type Tone = 'sheet' | 'panel';
 
 interface ModalProps {
   onClose: () => void;
@@ -18,6 +23,9 @@ interface ModalProps {
   subHeader?: ReactNode;
   footer?: ReactNode;
   align?: Align;
+  tone?: Tone;
+  /** 外壳的额外 class（例如给某块面板换主色调） */
+  sheetClassName?: string;
   /** body 的额外 class（例如去掉默认 padding） */
   bodyClassName?: string;
 }
@@ -43,9 +51,12 @@ export default function Modal({
   subHeader,
   footer,
   align = 'center',
+  tone = 'sheet',
+  sheetClassName = '',
   bodyClassName = '',
 }: ModalProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
+  const isPanel = tone === 'panel';
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -77,14 +88,20 @@ export default function Modal({
       role="dialog"
       aria-modal="true"
     >
+      {/* 面板型不做背景模糊：模糊会让下面那层「四象限」变成一团色块，
+          既看不清又不安静，反而更像一个临时弹窗。 */}
       <div
-        className="absolute inset-0 bg-violet-900/15 backdrop-blur-[3px] anim-backdrop-in"
+        className={`absolute inset-0 anim-backdrop-in ${
+          isPanel ? 'bg-violet-900/18' : 'bg-violet-900/15 backdrop-blur-[3px]'
+        }`}
         onClick={onClose}
       />
 
       <div
         ref={sheetRef}
-        className={`dialog-sheet relative z-10 ${isRight ? 'anim-drawer-in' : 'anim-sheet-in'}`}
+        className={`dialog-sheet ${isPanel ? 'dialog-panel' : ''} ${sheetClassName} relative z-10 ${
+          isRight ? 'anim-drawer-in' : 'anim-sheet-in'
+        }`}
         style={{ width: `min(${width}, calc(100vw - 2.5rem))` }}
       >
         {(title || icon || headerExtra) && (
