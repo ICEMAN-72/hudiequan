@@ -65,6 +65,11 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
 
   const totalCount = visibleTasks.filter((t) => !t.parentId).length;
 
+  /* 四格等分，不再按内容量伸缩。
+     上一版用 sqrt 权重让格子随任务数长大，结果四格比例不匀，
+     整块看着像拼贴而不是一张网。这一版要的就是规整：
+     右列贯通两行之后每个格子是 460×476，接近正方形，
+     四个格子尺寸一致，视觉上才立得住。 */
   return (
     <div className="h-full flex flex-col p-3 anim-slide-up">
       <div className="flex items-center gap-1.5 mb-1 shrink-0">
@@ -75,7 +80,6 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
         <span className="fs-2xs text-violet-300 tabular-nums">{totalCount} 项</span>
       </div>
 
-      {/* gap 12→8：四个格子各自的高度就多出 8px，全都还给任务条 */}
       <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-2 gap-2">
         {LAYOUT.flat().map((q) => {
           const config = QUADRANT_CONFIG[q];
@@ -83,7 +87,8 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
 
           return (
             <div key={q}
-              className={`${config.bg} ${config.border} border rounded-[12px] flex flex-col overflow-hidden min-h-0 dew-highlight shadow-warm`}
+              className={`${config.bg} border-[1.5px] rounded-[14px] flex flex-col overflow-hidden min-h-0 dew-highlight shadow-warm`}
+              style={{ borderColor: `${config.accent}30` }}
               onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
               onDrop={(e) => {
                 e.preventDefault(); e.stopPropagation();
@@ -100,7 +105,13 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
                 )}
               </div>
 
-              <div className="p-1 space-y-1.5 flex-1 overflow-y-auto scroll-thin min-h-0">
+              {/* 一行放得下就单列，超过 14 条才切双列。
+                  阈值不能低：列宽掉到 260px 时中文标题会被截成「验收自动备份在 Edge 上…」，
+                  与其多塞几条不如让人把字看全。 */}
+              <div
+                className="p-1 flex-1 overflow-y-auto scroll-thin min-h-0"
+                style={{ columnCount: items.length > 14 ? 2 : 1, columnGap: '0.5rem' }}
+              >
                 {items.length === 0 ? (
                   <div className="flex items-center justify-center h-full py-4"><span className="fs-2xs text-violet-200">—</span></div>
                 ) : (

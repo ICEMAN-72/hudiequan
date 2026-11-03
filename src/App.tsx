@@ -16,6 +16,9 @@ import StatsPanel from './components/StatsPanel';
 import ReviewModal from './components/ReviewModal';
 import Decorations from './components/Decorations';
 import DataRecoveryBanner from './components/DataRecoveryBanner';
+import QuickNotes from './components/QuickNotes';
+import Modal from './components/ui/Modal';
+import { useNoteStore, countActiveNotes } from './store/noteStore';
 import { useDailyReview } from './hooks/useDailyReview';
 import { autoBackupOnLaunch } from './lib/autoBackup';
 import type { RecurrenceType } from './types';
@@ -28,6 +31,8 @@ function App() {
   const [showCabinet, setShowCabinet] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showStats, setShowStats] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [showSupabase, setShowSupabase] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -39,6 +44,7 @@ function App() {
   const tasks = useTaskStore((s) => s.tasks);
   const batchComplete = useTaskStore((s) => s.batchComplete);
   const batchDelete = useTaskStore((s) => s.batchDelete);
+  const notes = useNoteStore((s) => s.notes);
 
   const review = useDailyReview();
 
@@ -110,31 +116,36 @@ function App() {
         onStatsClick={() => setShowStats(true)}
         onCabinetClick={() => setShowCabinet(true)}
         onCloudClick={() => setShowSupabase(true)}
+        onCalendarClick={() => setShowCalendar(true)}
+        onNotesClick={() => setShowNotes(true)}
+        noteCount={countActiveNotes(notes)}
       />
 
-      {/* 2x2 四宫格布局 */}
-      <div className="flex-1 grid grid-cols-2 grid-rows-2 p-4 gap-4 overflow-hidden relative z-10">
-        <div className="overflow-hidden rounded-[20px] shadow-warm surface-panel">
-          <TaskList
-            onEdit={openEditDrawer}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            selectedIds={selectedIds}
-            onToggleSelect={toggleSelect}
-          />
+      {/* 对半分：左右各占一半。左列上下等分给任务列表和周期任务，
+          右列四象限向下贯通两行 —— 四个象限格子因此变成正方形（460×476）。
+          日历不再常驻，走顶栏按钮呼出；灵感走浮窗。 */}
+      <div className="flex-1 flex gap-2.5 px-3 pb-3 pt-1 overflow-hidden relative z-10 min-h-0">
+        <div className="flex-1 min-w-0 flex flex-col gap-2.5">
+          {/* 左列 3:2，不是等比。周期任务通常只有个位数，等比会空掉一半；
+              而任务列表是每天盯得最久的地方，多给它 100px 就是多 3 条。 */}
+          <section className="tile flex-[1.5] min-h-0">
+            <TaskList
+              onEdit={openEditDrawer}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              selectedIds={selectedIds}
+              onToggleSelect={toggleSelect}
+            />
+          </section>
+
+          <section className="tile flex-1 min-h-0">
+            <RecurringTasksPanel onEdit={openEditDrawer} onCreateRecurring={openRecurringDrawer} />
+          </section>
         </div>
 
-        <div className="overflow-hidden rounded-[20px] shadow-warm surface-panel">
+        <section className="tile tile-major flex-1 min-w-0">
           <QuadrantView onEdit={openEditDrawer} />
-        </div>
-
-        <div className="overflow-hidden rounded-[20px] shadow-warm surface-panel">
-          <RecurringTasksPanel onEdit={openEditDrawer} onCreateRecurring={openRecurringDrawer} />
-        </div>
-
-        <div className="overflow-hidden rounded-[20px] shadow-warm surface-panel">
-          <Calendar />
-        </div>
+        </section>
       </div>
 
       {/* 新建任务 —— 右下角常驻 */}
@@ -171,6 +182,25 @@ function App() {
       {showCabinet && <CabinetDrawer onEdit={openEditDrawer} onClose={() => setShowCabinet(false)} />}
       {showHelp && <HelpPanel onClose={() => setShowHelp(false)} />}
       {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
+      {showNotes && <QuickNotes onClose={() => setShowNotes(false)} />}
+      {showCalendar && (
+        <Modal
+          onClose={() => setShowCalendar(false)}
+          width="54rem"
+          title="日历"
+          subtitle="按月看分布，点某天看当天要做什么"
+          iconBg="linear-gradient(135deg, #EDE9FE 0%, #FCE7F3 100%)"
+          icon={
+            <svg className="w-[1.15rem] h-[1.15rem] text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z" />
+            </svg>
+          }
+        >
+          <div style={{ height: 'min(66vh, 34rem)' }}>
+            <Calendar plain />
+          </div>
+        </Modal>
+      )}
       {showSupabase && <SupabasePanel onClose={() => setShowSupabase(false)} />}
       {review.open && <ReviewModal onClose={review.close} />}
 

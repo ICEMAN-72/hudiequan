@@ -9,7 +9,7 @@ const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'];
 const VIEW_LABEL: Record<ViewMode, string> = { month: '月', week: '周', day: '日' };
 type ViewMode = 'month' | 'week' | 'day';
 
-export default function Calendar() {
+export default function Calendar({ plain = false }: { plain?: boolean }) {
   const tasks = useTaskStore((s) => s.tasks);
   const showCompleted = useSettingsStore((s) => s.showCompleted);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -67,13 +67,15 @@ export default function Calendar() {
   const dayTaskList = view === 'day' ? tasksForDay(currentDayStr) : [];
 
   return (
-    <div className="h-full flex flex-col bg-white/70 backdrop-blur-sm rounded-[20px] shadow-warm p-5 overflow-hidden dew-highlight surface-panel">
+    <div className={plain ? 'h-full flex flex-col p-1' : 'h-full flex flex-col bg-white/70 backdrop-blur-sm rounded-[20px] shadow-warm p-5 overflow-hidden dew-highlight surface-panel'}>
       {/* Header */}
       <div className="flex items-center justify-between mb-3.5 shrink-0 gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
-          <svg className="w-[1.15rem] h-[1.15rem] text-violet-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" />
-          </svg>
+          {!plain && (
+            <svg className="w-[1.15rem] h-[1.15rem] text-violet-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" />
+            </svg>
+          )}
           <h3 className="fs-sm font-bold text-violet-800 truncate">{title}</h3>
           <button
             onClick={() => setCurrentDate(new Date())}

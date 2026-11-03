@@ -6,6 +6,10 @@ interface HeaderProps {
   onStatsClick: () => void;
   onCabinetClick: () => void;
   onCloudClick: () => void;
+  onCalendarClick: () => void;
+  onNotesClick: () => void;
+  /** 未处理的速记条数，>0 时按钮上挂徽章 */
+  noteCount: number;
 }
 
 /** Cute butterfly mark — rounder, softer wings with little antennae */
@@ -31,7 +35,7 @@ function ButterflyMark({ size = 30 }: { size?: number }) {
   );
 }
 
-export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpClick, onStatsClick, onCabinetClick, onCloudClick }: HeaderProps) {
+export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpClick, onStatsClick, onCabinetClick, onCloudClick, onCalendarClick, onNotesClick, noteCount }: HeaderProps) {
   return (
     <header className="relative z-30 h-[4rem] px-6 flex items-center justify-between bg-white/60 backdrop-blur-xl border-b border-violet-50/40 shadow-warm shrink-0">
       {/* Logo + Title */}
@@ -72,6 +76,26 @@ export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpC
 
         {/* Cabinet + Cloud + Stats + Help + Settings */}
         <div className="flex items-center gap-1.5">
+          {/* 灵感：唯一带数字常驻的入口 —— 它是「怕忘」的东西，越不起眼越没用 */}
+          <button
+            onClick={onNotesClick}
+            className="note-chip h-[2.4rem] px-3 flex items-center gap-1.5 rounded-full transition-colors"
+            style={{ opacity: noteCount > 0 ? 1 : 0.62 }}
+            title="灵感">
+            <svg className="w-[1rem] h-[1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l1.7 4.6 4.6 1.7-4.6 1.7L12 15.6l-1.7-4.6L5.7 9.3l4.6-1.7L12 3z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z" />
+            </svg>
+            <span className="fs-xs font-semibold tabular-nums">{noteCount}</span>
+          </button>
+          <button
+            onClick={onCalendarClick}
+            className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
+            title="日历">
+            <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z" />
+            </svg>
+          </button>
           <button
             onClick={onCabinetClick}
             className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"

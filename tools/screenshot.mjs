@@ -61,8 +61,9 @@ console.log(`static server on http://127.0.0.1:${HTTP_PORT}${BASE}`);
 // 所以浏览器必须由本进程持有，脚本结束一起退出） ----------
 const CHROME =
   process.env.CHROME_PATH ||
-  'C:////Users////22015////.agent-browser////browsers////chrome-152.0.7977.64////chrome.exe';
+  'C:\\Users\\22015\\.agent-browser\\browsers\\chrome-152.0.7977.64\\chrome.exe';
 const profile = mkdtempSync(join(tmpdir(), 'pf3-chrome-'));
+let chromeErr = '';
 const chromium = spawn(
   CHROME,
   [
@@ -77,8 +78,16 @@ const chromium = spawn(
     `--user-data-dir=${profile}`,
     'about:blank',
   ],
-  { stdio: 'ignore', detached: false }
+  { stdio: ['ignore', 'ignore', 'pipe'], detached: false }
 );
+// Chrome 起不来时，原来的 stdio:'ignore' 会让「连不上 CDP」变成一句无头悬案，
+// 把 stderr 收下来，失败时一起打出来。
+chromium.stderr?.on('data', (c) => {
+  chromeErr += c.toString();
+});
+chromium.on('error', (e) => {
+  chromeErr += `spawn error: ${e.message}\n`;
+});
 console.log('chrome pid', chromium.pid);
 
 // ---------- 2. 连 CDP ----------
@@ -111,7 +120,12 @@ for (let i = 0; i < 30; i++) {
   }
   await new Promise((r) => setTimeout(r, 250));
 }
-if (!target) throw new Error('连不上 CDP');
+if (!target) {
+  console.error('--- Chrome stderr ---');
+  console.error(chromeErr.trim() || '(空)');
+  console.error(`--- 退出码 ${chromium.exitCode} ---`);
+  throw new Error('连不上 CDP');
+}
 
 const ws = new WebSocket(target.webSocketDebuggerUrl);
 await new Promise((res, rej) => {
@@ -424,12 +438,25 @@ await shot('10-newtask');
 await closeModal();
 await sleep(400);
 
-// 日历：切到日视图（点击「日」按钮）
+// 日历：日历已经不在主界面，要先点顶栏按钮呼出，再切日视图
 await reload(false);
 await sleep(600);
-console.log(await clickByText('日'));
+console.log('open-calendar:', await clickByText('日历'));
+await sleep(800);
+console.log('calendar-day:', await clickByText('日'));
 await sleep(700);
 await shot('09-calendar-day');
+await closeModal();
+await sleep(400);
+
+// 灵感浮窗
+await reload(false);
+await sleep(600);
+console.log('open-ideas:', await clickByText('灵感'));
+await sleep(800);
+await shot('11-ideas');
+await closeModal();
+await sleep(300);
 
 // 局部放大：任务列表 / 四象限
 await reload(false);

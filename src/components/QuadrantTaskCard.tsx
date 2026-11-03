@@ -21,8 +21,11 @@ export default function QuadrantTaskCard({ task, depth, onEdit, onCycleStatus }:
   };
 
   return (
-    <div className={`group ${isDone ? 'opacity-40' : ''}`} style={{ marginLeft: indentPx }}>
-      <div className="flex items-center gap-2 px-2 py-1 surface-card rounded-[9px] shadow-warm hover:shadow-warm-hover transition-all duration-200">
+    <div
+      className={`group mb-1.5 ${isDone ? 'opacity-40' : ''}`}
+      style={{ marginLeft: indentPx, breakInside: 'avoid' }}
+    >
+      <div className="flex items-center gap-2 px-2 py-0.5 surface-card rounded-[8px] shadow-warm hover:shadow-warm-hover transition-all duration-200">
         <button
           onClick={onCycleStatus}
           className="relative w-[0.72rem] h-[0.72rem] rounded-full shrink-0 transition-all duration-200 active:scale-90"

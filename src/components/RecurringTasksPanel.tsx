@@ -95,9 +95,9 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
   };
 
   return (
-    <div className="h-full flex flex-col p-4 anim-slide-up">
+    <div className="h-full flex flex-col p-3 anim-slide-up">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3 px-1 shrink-0">
+      <div className="flex items-center justify-between mb-1.5 px-1 shrink-0">
         <div className="flex items-center gap-2.5">
           <svg className="w-[1rem] h-[1rem] text-teal-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -107,7 +107,7 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto scroll-thin space-y-2.5 pr-1">
+      <div className="flex-1 min-h-0 overflow-y-auto scroll-thin space-y-1.5 pr-1">
         {groups.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center gap-2">
             <svg className="w-8 h-8 text-teal-200 mb-1 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -123,8 +123,8 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
             const t = g.current;
             const isOpen = expandedHistory.has(g.templateId);
             return (
-              <div key={g.templateId} className="space-y-2">
-                <div className="group flex items-center gap-2.5 px-3.5 py-3 rounded-[14px] surface-card shadow-warm hover:shadow-warm-hover transition-all duration-200">
+              <div key={g.templateId} className="space-y-1.5">
+                <div className="group flex items-center gap-2 px-2.5 py-1.5 rounded-[10px] surface-card shadow-warm hover:shadow-warm-hover transition-all duration-200">
                   {/* 状态圈 —— 只在有当前期时可点 */}
                   <button
                     onClick={() => t && cycleStatus(t.id)}
@@ -146,21 +146,21 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
                     )}
                   </button>
 
-                  {/* 标题 + 日期 */}
-                  <div className="flex-1 min-w-0">
+                  {/* 标题 + 日期：压成一行。原来是两行，卡片 44px，一行就省掉 14px */}
+                  <div className="flex-1 min-w-0 flex items-baseline gap-1.5">
                     <p
-                      className={`fs-xs text-violet-800 truncate ${t ? 'cursor-pointer' : 'text-violet-400'}`}
+                      className={`fs-xs truncate ${t ? 'cursor-pointer text-violet-800' : 'text-violet-400'}`}
                       onClick={() => (t ? onEdit(t.id) : undefined)}
                     >
                       {g.title}
                     </p>
-                    <p className="fs-2xs text-violet-300 mt-0.5">
+                    <span className="fs-2xs text-violet-300 shrink-0 tabular-nums">
                       {t?.startDate
                         ? formatDateDisplay(t.startDate)
                         : g.nextDate
                         ? `下期 ${formatDateDisplay(g.nextDate)}`
                         : '等待下期'}
-                    </p>
+                    </span>
                   </div>
 
                   {/* 频率 */}
@@ -186,18 +186,18 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
                     {t && (
                       <button
                         onClick={() => { setAddSubId(t.id); setSubTitle(''); }}
-                        className="p-1.5 rounded-full text-violet-300 hover:text-teal-600 hover:bg-teal-50/60 transition-colors"
+                        className="icon-btn w-[1.05rem] h-[1.05rem] text-violet-300 hover:text-teal-600 hover:bg-teal-50/60"
                         title="添加子任务"
                       >
-                        <svg className="w-[0.85rem] h-[0.85rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                        <svg className="w-[0.72rem] h-[0.72rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                         </svg>
                       </button>
                     )}
                     {t && (
                       <button onClick={() => onEdit(t.id)}
-                        className="p-1.5 rounded-full text-violet-300 hover:text-pink-600 hover:bg-pink-50/60 transition-colors" title="编辑">
-                        <svg className="w-[0.85rem] h-[0.85rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                        className="icon-btn w-[1.05rem] h-[1.05rem] text-violet-300 hover:text-pink-600 hover:bg-pink-50/60" title="编辑">
+                        <svg className="w-[0.72rem] h-[0.72rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
@@ -205,10 +205,10 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
                     <button
                       onClick={() => t && deleteTask(t.id)}
                       disabled={!t}
-                      className="p-1.5 rounded-full text-violet-300 hover:text-red-400 hover:bg-red-50/60 transition-colors disabled:opacity-30"
+                      className="icon-btn w-[1.05rem] h-[1.05rem] text-violet-300 hover:text-red-400 hover:bg-red-50/60 disabled:opacity-30"
                       title="删除本期"
                     >
-                      <svg className="w-[0.85rem] h-[0.85rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                      <svg className="w-[0.72rem] h-[0.72rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
@@ -279,6 +279,18 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
           })
         )}
       </div>
+
+      {/* 空着的下半块交给这条虚线 —— 周期任务通常只有个位数，
+          底部留一大片空会比「多一个入口」更让人以为加载失败。
+          放在滚动区外面，才会贴着面板底部而不是跟着列表走。 */}
+      {groups.length > 0 && (
+        <button
+          onClick={onCreateRecurring}
+          className="shrink-0 mt-2 w-full py-1.5 rounded-[10px] border border-dashed border-teal-200/70 fs-2xs text-teal-400 hover:text-teal-600 hover:border-teal-300 transition-colors"
+        >
+          + 新建周期任务
+        </button>
+      )}
     </div>
   );
 }

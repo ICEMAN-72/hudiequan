@@ -128,7 +128,7 @@ export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, o
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`group relative flex items-center gap-2 pl-3 pr-2 py-1 rounded-[10px] surface-card transition-all duration-200 cursor-grab active:cursor-grabbing ${
+        className={`group relative flex items-center gap-2 pl-3 pr-2 py-0.5 rounded-[9px] surface-card transition-all duration-200 cursor-grab active:cursor-grabbing ${
           dragOver
             ? 'ring-2 ring-violet-300 ring-offset-2 shadow-warm-hover'
             : 'shadow-warm hover:shadow-warm-hover hover:-translate-y-[1px]'
