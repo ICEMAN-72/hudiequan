@@ -1,5 +1,4 @@
 import { useTaskStore } from '../store/taskStore';
-import { useSettingsStore } from '../store/settingsStore';
 import type { Task, Quadrant } from '../types';
 import { getQuadrant, isRecurringTask, QUADRANT_CONFIG } from '../types';
 import QuadrantTaskCard from './QuadrantTaskCard';
@@ -34,7 +33,6 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
   const tasks = useTaskStore((s) => s.tasks);
   const cycleStatus = useTaskStore((s) => s.cycleStatus);
   const updateTask = useTaskStore((s) => s.updateTask);
-  const showCompleted = useSettingsStore((s) => s.showCompleted);
 
   const QUADRANT_VALUES: Record<Quadrant, { urgency: Task['urgency']; importance: Task['importance'] }> = {
     do: { urgency: 'high', importance: 'high' },
@@ -43,27 +41,35 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
     eliminate: { urgency: 'low', importance: 'low' },
   };
 
-  // Filter: non-trashed, optionally hide done
-  const visibleTasks = tasks.filter((t) => !t.isTrashed && !isRecurringTask(t) && (showCompleted || t.status !== 'done'));
+  /* 四象限是「待办视图」：做完的事一律离场。
+     以前这里跟着「显示已完成」开关走，开关一开，完成的任务就留在格子里，
+     越做越满，真正还没做的反而被挤到看不见。
+     离开这里不等于任务消失 —— 任务列表和存储柜照样能看到。 */
+  const pendingTasks = tasks.filter((t) => !t.isTrashed && !isRecurringTask(t) && t.status !== 'done');
+  const pendingIds = new Set(pendingTasks.map((t) => t.id));
+
+  /* 父任务已完成、子任务还开着，这个状态是真实存在的 ——
+     完成父任务不会级联子任务。这种子任务如果还按 parentId 归组，
+     就会因为父级不在列表里而凭空消失，所以把它提升成根、单独成条。 */
+  const isRootOf = (t: Task) => !t.parentId || !pendingIds.has(t.parentId);
 
   const grouped: Record<Quadrant, Task[]> = {
     do: [], schedule: [], delegate: [], eliminate: [],
   };
-  visibleTasks.forEach((task) => grouped[getQuadrant(task)].push(task));
+  const order: Record<Task['status'], number> = { in_progress: 0, todo: 1, done: 2 };
 
-  // Sort each group: roots first, then by status
-  Object.keys(grouped).forEach((key) => {
-    const q = key as Quadrant;
-    const roots = grouped[q].filter((t) => !t.parentId);
-    const order: Record<Task['status'], number> = { in_progress: 0, todo: 1, done: 2 };
-    roots.sort((a, b) => {
+  for (const task of pendingTasks) {
+    if (isRootOf(task)) grouped[getQuadrant(task)].push(task);
+  }
+
+  (Object.keys(grouped) as Quadrant[]).forEach((q) => {
+    grouped[q].sort((a, b) => {
       if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
       return b.createdAt - a.createdAt;
     });
-    grouped[q] = roots;
   });
 
-  const totalCount = visibleTasks.filter((t) => !t.parentId).length;
+  const totalCount = pendingTasks.filter(isRootOf).length;
 
   /* 四格等分，不再按内容量伸缩。
      上一版用 sqrt 权重让格子随任务数长大，结果四格比例不匀，
@@ -77,7 +83,7 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h16v16H4z M4 12h16 M12 4v16" />
         </svg>
         <h3 className="text-sm font-bold text-violet-800">四象限</h3>
-        <span className="fs-2xs text-violet-300 tabular-nums">{totalCount} 项</span>
+        <span className="fs-2xs text-violet-300 tabular-nums">{totalCount} 项待办</span>
       </div>
 
       <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-2 gap-2">
@@ -115,7 +121,7 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
                 {items.length === 0 ? (
                   <div className="flex items-center justify-center h-full py-4"><span className="fs-2xs text-violet-200">—</span></div>
                 ) : (
-                  items.map((task) => renderTree(task, 0, visibleTasks, onEdit, cycleStatus))
+                  items.map((task) => renderTree(task, 0, pendingTasks, onEdit, cycleStatus))
                 )}
               </div>
             </div>

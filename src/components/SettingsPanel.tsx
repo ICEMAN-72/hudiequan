@@ -205,7 +205,7 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
           <div className="mt-2.5">
             <ToggleRow
               label="显示已完成"
-              hint="关掉后列表里隐藏已完成任务"
+              hint="列表和日历是否显示已完成；四象限只放未完成的"
               on={showCompleted}
               onToggle={() => setShowCompleted(!showCompleted)}
             />
