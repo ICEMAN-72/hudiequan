@@ -111,13 +111,11 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
                 )}
               </div>
 
-              {/* 一行放得下就单列，超过 14 条才切双列。
-                  阈值不能低：列宽掉到 260px 时中文标题会被截成「验收自动备份在 Edge 上…」，
-                  与其多塞几条不如让人把字看全。 */}
-              <div
-                className="p-1 flex-1 overflow-y-auto scroll-thin min-h-0"
-                style={{ columnCount: items.length > 14 ? 2 : 1, columnGap: '0.5rem' }}
-              >
+              {/* 永远单列。
+                  之前超过 14 条会切成两列，本意是多塞几条，实际效果是同一格里
+                  并排两摞卡片 —— 象限本身是「一眼扫过去」的东西，两列会让它
+                  变成需要逐列读的表，比看不见更糟。宁可滚动。 */}
+              <div className="p-1 flex-1 overflow-y-auto scroll-thin min-h-0">
                 {items.length === 0 ? (
                   <div className="flex items-center justify-center h-full py-4"><span className="fs-2xs text-violet-200">—</span></div>
                 ) : (

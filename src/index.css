@@ -397,6 +397,23 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
 .dark .text-pink-800 { color: #FBCFE8 !important; }
 .dark .text-teal-200 { color: #99F6E4 !important; }
 
+/* ---- 灵感浮窗：琥珀色系统一补深色态 ----
+   浅色下便签正文是 amber-900（最深的一档），深色下必须翻成最亮的一档，
+   否则深棕字压在深紫纸上，对比度还不到 3:1，读起来费劲。 */
+.dark .text-amber-900 { color: #FDE68A !important; }
+.dark .text-amber-500 { color: #FBBF24 !important; }
+.dark .text-amber-400 { color: #D9A63A !important; }
+.dark .text-amber-400\/80 { color: rgba(217, 166, 58, 0.8) !important; }
+.dark .text-amber-300 { color: #A6823C !important; }
+.dark .text-amber-200 { color: #8A6A2E !important; }
+.dark .bg-amber-400 { background: rgba(251, 191, 36, 0.82) !important; }
+.dark .bg-pink-50\/70 { background: rgba(236, 72, 153, 0.14) !important; }
+.dark .border-amber-200\/70 { border-color: rgba(251, 191, 36, 0.22) !important; }
+.dark .border-amber-300 { border-color: rgba(251, 191, 36, 0.3) !important; }
+.dark .border-amber-400 { border-color: rgba(251, 191, 36, 0.45) !important; }
+.dark .border-amber-500 { border-color: rgba(251, 191, 36, 0.55) !important; }
+
+
 /* ---- 日历：蓝色系深色覆盖（v3.6 起日历从紫色改为蓝色） ---- */
 .dark .text-blue-800 { color: #BFDBFE !important; }
 .dark .text-blue-700 { color: #93C5FD !important; }
@@ -500,6 +517,49 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
 .dark .dialog-sheet.dialog-panel {
   background: #211C33 !important;
   border-color: rgba(255, 255, 255, 0.07);
+}
+
+/* --------------------------------------------------------------------------
+   可拖动浮窗（灵感）
+   和 .dialog-panel 同材质，但**没有任何遮罩** —— 它要和主界面同时可用，
+   遮罩哪怕只压暗 18%，下面的任务也就没法「对照」了。
+   位置由 JS 写 left/top，这里只管外观，不放 right/bottom（会和 left 打架）。
+   -------------------------------------------------------------------------- */
+.floating-window {
+  position: fixed;
+  z-index: 40;
+  max-height: calc(100vh - 1.5rem);
+}
+.floating-window-grip {
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  /* 触屏上拖动标题栏不该同时滚动页面 */
+  touch-action: none;
+}
+.floating-window-grip.is-dragging {
+  cursor: grabbing;
+}
+.floating-window.is-moving,
+.floating-window:has(.is-dragging) {
+  box-shadow:
+    0 26px 64px rgba(124, 58, 237, 0.22),
+    0 6px 18px rgba(236, 72, 153, 0.10);
+}
+.floating-window-hint {
+  color: #C9BCE4;
+  opacity: 0.7;
+  transition: opacity 0.2s, color 0.2s;
+}
+.floating-window-grip:hover .floating-window-hint {
+  opacity: 1;
+  color: #A78BDB;
+}
+.dark .floating-window-hint {
+  color: #6F6390 !important;
+}
+.dark .floating-window-grip:hover .floating-window-hint {
+  color: #9C8AC4 !important;
 }
 
 /* 面板表面 / 卡片表面
@@ -707,6 +767,22 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
   .stagger > * {
     animation: none !important;
   }
+}
+
+/* --------------------------------------------------------------------------
+   浮窗深色态
+   放在最后并且用四段选择器：`.dark .dialog-sheet.dialog-panel` 的特异性是
+   三个类，写在它前面、只有两个类的规则会被直接压掉（这个坑在本项目里
+   已经吃过一次 —— 无层级 / 高特异性规则永远赢在起跑线上）。
+   #211C33 比主界面磁贴还暗，看上去像凹进去；提到 #2A2442 才是「浮起来」。
+   -------------------------------------------------------------------------- */
+.dark .dialog-sheet.dialog-panel.floating-window {
+  background: #2A2442 !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+  box-shadow:
+    0 26px 64px rgba(0, 0, 0, 0.55),
+    0 3px 12px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 

@@ -371,7 +371,8 @@ await evalJs(`
 `);
 
 async function reload(dark) {
-  await evalJs(`localStorage.setItem('hudiequan-settings', ${JSON.stringify(dark ? seedDark : seedLight)}); 'ok'`);
+  // 顺手清掉浮窗记住的位置，否则上一次拖到哪这次就截到哪，图不可复现
+  await evalJs(`localStorage.setItem('hudiequan-settings', ${JSON.stringify(dark ? seedDark : seedLight)}); localStorage.removeItem('hudiequan-notes-pos'); 'ok'`);
   await send('Page.navigate', { url: APP });
   await sleep(2200);
 }
@@ -389,8 +390,15 @@ const clickByText = (text) =>
       return 'OK';
     })()
   `);
+/* 灵感浮窗没有遮罩（非模态），点 backdrop 关不掉，得点它自己的关闭按钮 */
 const closeModal = () =>
-  evalJs(`document.querySelector('.anim-backdrop-in')?.click(); 'x'`);
+  evalJs(`(() => {
+    const bd = document.querySelector('.anim-backdrop-in');
+    if (bd) { bd.click(); return 'backdrop'; }
+    const btn = document.querySelector('.floating-window button[aria-label="关闭"]');
+    if (btn) { btn.click(); return 'floating'; }
+    return 'none';
+  })()`);
 
 // ---------- 4. 场景 ----------
 console.log('--- light ---');
@@ -471,6 +479,52 @@ await sleep(600);
 console.log('open-ideas:', await clickByText('灵感'));
 await sleep(800);
 await shot('11-ideas');
+
+/* 拖动验证：按住标题栏往左下甩，确认窗口真的跟着走（不是只有光标样式变了）。
+   用真实的 Input 事件，而不是直接改 DOM —— 后者绕过 React 的 pointer 处理，
+   测不出「监听挂错了元素」这类错误。 */
+const grip = await evalJs(`(() => {
+  const el = document.querySelector('.floating-window-grip');
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  return { x: Math.round(r.x + 90), y: Math.round(r.y + 24) };
+})()`);
+
+if (grip) {
+  const mouse = (type, x, y) =>
+    send('Input.dispatchMouseEvent', {
+      type,
+      x,
+      y,
+      button: 'left',
+      buttons: type === 'mouseReleased' ? 0 : 1,
+      clickCount: 1,
+    });
+
+  const beforeX = await evalJs(`Math.round(document.querySelector('.floating-window').getBoundingClientRect().x)`);
+  await mouse('mousePressed', grip.x, grip.y);
+  await sleep(70);
+  await mouse('mouseMoved', grip.x - 220, grip.y + 110);
+  await sleep(80);
+  await mouse('mouseMoved', grip.x - 430, grip.y + 195);
+  await sleep(80);
+  await mouse('mouseReleased', grip.x - 430, grip.y + 195);
+  await sleep(320);
+
+  const afterX = await evalJs(`Math.round(document.querySelector('.floating-window').getBoundingClientRect().x)`);
+  console.log(`drag: ${beforeX} -> ${afterX}`, beforeX !== afterX ? 'OK' : 'FAIL(没动)');
+  await shot('12-ideas-dragged');
+}
+
+await closeModal();
+await sleep(300);
+
+// 深色下的浮窗：它没有遮罩，深色纸是唯一的高度来源，容易糊进背景
+await reload(true);
+await sleep(600);
+console.log('ideas-dark:', await clickByText('灵感'));
+await sleep(700);
+await shot('13-ideas-dark');
 await closeModal();
 await sleep(300);
 

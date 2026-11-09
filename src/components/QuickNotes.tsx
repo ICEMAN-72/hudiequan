@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import Modal from './ui/Modal';
+import FloatingWindow from './ui/FloatingWindow';
 import { useNoteStore, countActiveNotes } from '../store/noteStore';
 import { useTaskStore } from '../store/taskStore';
 import type { QuickNote } from '../store/noteStore';
@@ -155,13 +155,12 @@ export default function QuickNotes({ onClose }: QuickNotesProps) {
   };
 
   return (
-    <Modal
+    <FloatingWindow
       onClose={onClose}
-      width="52rem"
-      tone="panel"
-      bodyClassName="min-h-[22rem]"
+      width={740}
+      storageKey="hudiequan-notes-pos"
       title="灵感"
-      subtitle={`${countActiveNotes(notes)} 条待处理 · 灵光一现，先扔这儿`}
+      subtitle={`${countActiveNotes(notes)} 条待处理 · 可以拖到一边，对着任务列表慢慢处理`}
       iconBg="linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)"
       icon={
         <svg className="w-[1.15rem] h-[1.15rem] text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -177,7 +176,7 @@ export default function QuickNotes({ onClose }: QuickNotesProps) {
         ) : undefined
       }
     >
-      <div className="space-y-3">
+      <div className="space-y-3 min-h-[19rem]">
         <div className="flex items-center gap-2">
           <input
             ref={inputRef}
@@ -229,6 +228,6 @@ export default function QuickNotes({ onClose }: QuickNotesProps) {
           {toast}
         </div>
       )}
-    </Modal>
+    </FloatingWindow>
   );
 }

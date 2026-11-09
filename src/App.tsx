@@ -117,7 +117,7 @@ function App() {
         onCabinetClick={() => setShowCabinet(true)}
         onCloudClick={() => setShowSupabase(true)}
         onCalendarClick={() => setShowCalendar(true)}
-        onNotesClick={() => setShowNotes(true)}
+        onNotesClick={() => setShowNotes((v) => !v)}
         noteCount={countActiveNotes(notes)}
       />
 
