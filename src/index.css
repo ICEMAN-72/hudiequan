@@ -800,7 +800,7 @@ body.dark { background: linear-gradient(135deg, #1B1533 0%, #241332 40%, #221A1A
   border-color: rgba(129, 140, 248, 0.30);
 }
 .dark .quad-tile--delegate {
-  background: linear-gradient(168deg, #452F1D 0%, #362718 78%);
+  background: linear-gradient(168deg, #3E2B1A 0%, #32251A 78%);
   border-color: rgba(251, 191, 36, 0.26);
 }
 .dark .quad-tile--eliminate {
@@ -816,7 +816,7 @@ body.dark { background: linear-gradient(135deg, #1B1533 0%, #241332 40%, #221A1A
   border-bottom-color: rgba(129, 140, 248, 0.34);
 }
 .dark .quad-head--delegate {
-  background: linear-gradient(90deg, #573A1E 0%, #43301A 100%);
+  background: linear-gradient(90deg, #4C331C 0%, #3B2C1A 100%);
   border-bottom-color: rgba(251, 191, 36, 0.32);
 }
 .dark .quad-head--eliminate {
