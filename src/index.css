@@ -707,6 +707,56 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
   color: #4B1528;
 }
 
+/* 新建任务表单里的「象限归属」选区块。
+   原来这两处底色写死在 inline style 里，深色模式下整块发亮 ——
+   inline style 的优先级高于任何 .dark 规则，只能挪到类上来。 */
+.quadrant-picker {
+  background: linear-gradient(135deg, rgba(243, 232, 255, 0.6) 0%, rgba(252, 231, 243, 0.4) 100%);
+  border: 1.5px solid rgba(196, 181, 253, 0.25);
+}
+.quadrant-tile {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 3px rgba(124, 58, 237, 0.05);
+}
+.dark .quadrant-picker {
+  background: linear-gradient(135deg, rgba(76, 60, 130, 0.34) 0%, rgba(96, 50, 96, 0.26) 100%);
+  border-color: rgba(196, 181, 253, 0.18);
+}
+.dark .quadrant-tile {
+  background: rgba(58, 49, 92, 0.82);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+}
+
+/* 新建任务表单里的三块彩色纸。
+   底色原来全写死在 inline style 里 —— inline 的优先级高于任何 .dark 规则，
+   所以浅色模式下是雅致的淡纸，深色模式下就是三块发亮的光板。
+   深色态保留一点色相余味（粉/紫/蓝），但明度压到和面板同一档。 */
+.form-icon-badge {
+  background: linear-gradient(135deg, #F3E8FF 0%, #FCE7F3 100%);
+}
+.form-card {
+  border: 1.5px solid transparent;
+}
+.form-card--time {
+  background: linear-gradient(135deg, rgba(252, 231, 243, 0.6) 0%, rgba(254, 215, 226, 0.4) 100%);
+  border-color: rgba(249, 168, 212, 0.3);
+}
+.form-card--sub {
+  background: linear-gradient(135deg, rgba(237, 233, 254, 0.6) 0%, rgba(224, 231, 255, 0.4) 100%);
+  border-color: rgba(165, 180, 252, 0.3);
+}
+.dark .form-icon-badge {
+  background: linear-gradient(135deg, #3D3568 0%, #4A3268 100%);
+}
+.dark .form-card--time {
+  background: linear-gradient(135deg, rgba(120, 50, 90, 0.28) 0%, rgba(140, 60, 100, 0.22) 100%);
+  border-color: rgba(249, 168, 212, 0.16);
+}
+.dark .form-card--sub {
+  background: linear-gradient(135deg, rgba(76, 60, 130, 0.32) 0%, rgba(60, 70, 130, 0.26) 100%);
+  border-color: rgba(165, 180, 252, 0.18);
+}
+
 /* 图标按钮 —— 统一按压反馈 */
 /* 次级操作 chip —— 必须自带边框/底色，否则 bg-violet-50 这种
    落在同样是淡紫的弹窗纸上会彻底隐形。 */

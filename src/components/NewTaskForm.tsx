@@ -138,7 +138,7 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
       {/* Header */}
       <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F3E8FF 0%, #FCE7F3 100%)' }}>
+          <div className="form-icon-badge w-10 h-10 rounded-2xl flex items-center justify-center">
             <svg className="w-5 h-5 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
@@ -180,7 +180,9 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
         />
 
         {/* Quadrant card — distinct purple tint background */}
-        <div className="rounded-[20px] p-5" style={{ background: 'linear-gradient(135deg, rgba(243, 232, 255, 0.6) 0%, rgba(252, 231, 243, 0.4) 100%)', border: '1.5px solid rgba(196, 181, 253, 0.25)' }}>
+        {/* 底色走 .quadrant-picker 而不是 inline style：
+            写死的 rgba 浅紫渐变深色模式盖不住，整块会亮成一片。 */}
+        <div className="quadrant-picker rounded-[20px] p-5">
           {/* Section title row */}
           <div className="flex items-center gap-2.5 mb-4 px-1">
             <span className="text-lg">🎯</span>
@@ -199,14 +201,11 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
                 <button
                   key={q}
                   onClick={() => setSelectedQuadrant(q)}
-                  className="text-center px-2 py-4 rounded-[14px] transition-all duration-200"
+                  className={`quadrant-tile text-center px-2 py-4 rounded-[14px] transition-all duration-200 ${isSelected ? 'quadrant-tile--on' : ''}`}
                   style={isSelected ? {
                     background: config.accentLight,
                     boxShadow: `0 0 0 2px ${config.accent}, 0 4px 14px ${config.accent}26`,
-                  } : {
-                    background: 'rgba(255, 255, 255, 0.9)',
-                    boxShadow: '0 1px 3px rgba(124, 58, 237, 0.05)',
-                  }}
+                  } : undefined}
                 >
                   <div className="text-xl mb-1.5 leading-none">{QUADRANT_ICONS[q]}</div>
                   <div className={`text-sm font-bold mb-0.5 ${isSelected ? config.text : 'text-violet-700'}`}>
@@ -233,7 +232,7 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
         </div>
 
         {/* Time card — distinct pink tint background */}
-        <div className="rounded-[20px] p-5" style={{ background: 'linear-gradient(135deg, rgba(252, 231, 243, 0.6) 0%, rgba(254, 215, 226, 0.4) 100%)', border: '1.5px solid rgba(249, 168, 212, 0.3)' }}>
+        <div className="form-card form-card--time rounded-[20px] p-5">
           {/* Section title row */}
           <div className="flex items-center gap-2.5 mb-4 px-1">
             <span className="text-lg">⏰</span>
@@ -320,7 +319,7 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
 
         {/* Sub-task management — only when editing */}
         {editingTaskId && (
-          <div className="rounded-[20px] p-5" style={{ background: 'linear-gradient(135deg, rgba(237, 233, 254, 0.6) 0%, rgba(224, 231, 255, 0.4) 100%)', border: '1.5px solid rgba(165, 180, 252, 0.3)' }}>
+          <div className="form-card form-card--sub rounded-[20px] p-5">
             <div className="flex items-center justify-between mb-4 px-1">
               <div className="flex items-center gap-2.5">
                 <span className="text-lg">📋</span>
@@ -394,7 +393,8 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
           {editingTaskId ? '保存修改' : '添加任务'}
         </button>
 
-        <p className="text-xs text-violet-200 text-center mt-3">
+        {/* 键盘提示在手机上没意义，还占掉一行 */}
+        <p className="hidden md:block text-xs text-violet-200 text-center mt-3">
           Ctrl + Enter 快速保存 · Esc 关闭
         </p>
       </div>

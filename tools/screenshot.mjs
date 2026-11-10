@@ -691,6 +691,48 @@ console.log(
 );
 await sleep(450);
 await shot('20-mobile-quadrants');
+
+// 手机上真正天天用的是弹窗 —— 宽度有 min() 兜底不会溢出，
+// 但面板内部的多列 grid 在 390px 里会被压扁，必须逐个打开看
+const backToTop = () =>
+  evalJs(`(() => { const el = document.querySelector('[data-scroll="main"]'); if (el) el.scrollTo(0,0); return 'top'; })()`);
+await backToTop();
+await sleep(250);
+
+const openViaMore = async (label, name) => {
+  await clickSel('button[title="更多"]');
+  await sleep(280);
+  console.log(`${name}:`, await clickByText(label));
+  await sleep(650);
+  await shot(name);
+  await closeModal();
+  await sleep(320);
+};
+
+await openViaMore('设置', '21-mobile-settings');
+await openViaMore('统计', '22-mobile-stats');
+await openViaMore('存储柜', '23-mobile-cabinet');
+
+// 日历在顶栏常驻，不用走「更多」
+console.log('calendar:', await clickByText('日历'));
+await sleep(800);
+await shot('24-mobile-calendar');
+await closeModal();
+await sleep(320);
+
+// 灵感是浮窗，没有遮罩
+console.log('notes:', await clickByText('灵感'));
+await sleep(700);
+await shot('25-mobile-notes');
+await closeModal();
+await sleep(320);
+
+// 新建任务
+console.log('newtask:', await clickByText('新建任务'));
+await sleep(700);
+await shot('26-mobile-newtask');
+await closeModal();
+await sleep(320);
 // 还原桌面视口，避免影响后续人工检查
 await send('Emulation.setDeviceMetricsOverride', {
   width: 1680,

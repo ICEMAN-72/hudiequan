@@ -210,13 +210,13 @@ export default function QuickNotes({ onClose }: QuickNotesProps) {
         ) : (
           <>
             {active.length > 0 && (
-              <ul className="grid grid-cols-2 gap-2 items-start">{active.map(renderItem)}</ul>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 items-start">{active.map(renderItem)}</ul>
             )}
 
             {finished.length > 0 && (
               <div className="pt-1">
                 <p className="fs-2xs text-amber-400 px-1 mb-1.5">已处理 {finished.length}</p>
-                <ul className="grid grid-cols-2 gap-2 items-start">{finished.map(renderItem)}</ul>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 items-start">{finished.map(renderItem)}</ul>
               </div>
             )}
           </>
