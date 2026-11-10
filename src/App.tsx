@@ -100,6 +100,14 @@ function App() {
     });
   };
   const clearSelection = () => setSelectedIds(new Set());
+  /** 久置筛选态下一次性选中一批（已选的原样保留，不做 toggle） */
+  const selectAll = (ids: string[]) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      for (const id of ids) next.add(id);
+      return next;
+    });
+  };
   const handleBatchComplete = () => { batchComplete([...selectedIds]); clearSelection(); };
   const handleBatchDelete = () => { batchDelete([...selectedIds]); clearSelection(); };
 
@@ -135,6 +143,7 @@ function App() {
               onSearchChange={setSearchQuery}
               selectedIds={selectedIds}
               onToggleSelect={toggleSelect}
+              onSelectAll={selectAll}
             />
           </section>
 

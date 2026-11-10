@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTaskStore } from '../store/taskStore';
 import { useSettingsStore } from '../store/settingsStore';
+import { useToday } from '../hooks/useToday';
+import { ageInDays, AGE_STALE_DAYS } from '../lib/date';
 import type { Task, SortOption } from '../types';
 import { isRecurringTask } from '../types';
 import TaskNode from './TaskNode';
@@ -11,6 +13,7 @@ interface TaskListProps {
   onSearchChange: (q: string) => void;
   selectedIds: Set<string>;
   onToggleSelect: (id: string) => void;
+  onSelectAll: (ids: string[]) => void;
 }
 
 const SORT_LABELS: Record<SortOption, string> = {
@@ -72,20 +75,40 @@ function matchesQuery(task: Task, query: string, allTasks: Task[]): boolean {
   return children.some((c) => c.title.toLowerCase().includes(q));
 }
 
-export default function TaskList({ onEdit, searchQuery, onSearchChange, selectedIds, onToggleSelect }: TaskListProps) {
+export default function TaskList({ onEdit, searchQuery, onSearchChange, selectedIds, onToggleSelect, onSelectAll }: TaskListProps) {
   const tasks = useTaskStore((s) => s.tasks);
   const sortBy = useTaskStore((s) => s.sortBy);
   const setSortBy = useTaskStore((s) => s.setSortBy);
   const moveTask = useTaskStore((s) => s.moveTask);
   const showCompleted = useSettingsStore((s) => s.showCompleted);
+  const today = useToday();
   const [dragOverRoot, setDragOverRoot] = useState(false);
   const [showSort, setShowSort] = useState(false);
+  /** 只看「久置」——悬置 14 天以上还没做完的。治积压用，平时不打扰 */
+  const [staleOnly, setStaleOnly] = useState(false);
 
   const activeTasks = tasks.filter((t) => !t.isTrashed);
   const sortedRoots = sortRootTasks(activeTasks, sortBy);
   const filteredRoots = sortedRoots.filter((t) =>
     (showCompleted || t.status !== 'done') && matchesQuery(t, searchQuery, activeTasks)
   );
+
+  /**
+   * 久置任务：躺满 14 天还没做完。
+   * 只按根任务判定 —— 列表是按根渲染的，子任务跟着父级一起出现，
+   * 单独把子任务挑出来会让它脱离上下文。
+   */
+  const staleRoots = useMemo(
+    () => sortedRoots.filter((t) => t.status !== 'done' && ageInDays(t.createdAt, today) >= AGE_STALE_DAYS),
+    [sortedRoots, today]
+  );
+  const staleIdSet = useMemo(() => new Set(staleRoots.map((t) => t.id)), [staleRoots]);
+
+  // 筛选和搜索是叠加关系：先搜，再在结果里挑久置的。
+  // 这里再 and 一次 staleRoots.length：万一在筛选态下把陈年任务删光了，
+  // chip 会消失、staleOnly 却还停在 true —— 不加这一条，列表会空着且退不出来。
+  const staleFilterOn = staleOnly && staleRoots.length > 0;
+  const visibleRoots = staleFilterOn ? filteredRoots.filter((t) => staleIdSet.has(t.id)) : filteredRoots;
 
   const totalAll = sortedRoots.length;
   const doneAll = sortedRoots.filter((t) => t.status === 'done').length;
@@ -141,6 +164,20 @@ export default function TaskList({ onEdit, searchQuery, onSearchChange, selected
 
         <div className="flex-1" />
 
+        {/* 久置开关 —— 没有陈年任务时根本不出现，平时不占位 */}
+        {staleRoots.length > 0 && (
+          <button
+            onClick={() => setStaleOnly((v) => !v)}
+            className={`stale-chip fs-2xs font-semibold shrink-0 ${staleFilterOn ? 'stale-chip--on' : ''}`}
+            title="悬置 14 天以上还没做完的任务。点一下只看这些"
+          >
+            <svg className="w-[0.7rem] h-[0.7rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.4}>
+              <circle cx="12" cy="12" r="9" /><path strokeLinecap="round" d="M12 7v5l3 2" />
+            </svg>
+            久置 {staleRoots.length}
+          </button>
+        )}
+
         {/* Search bar — icon on left, outside input */}
         <div className="w-[10rem] shrink-0 flex items-center gap-1.5 bg-violet-50/40 rounded-full px-2.5 py-1.5 border border-transparent focus-within:border-violet-200 focus-within:bg-white transition-all">
           <svg className="w-[0.85rem] h-[0.85rem] text-violet-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -185,6 +222,21 @@ export default function TaskList({ onEdit, searchQuery, onSearchChange, selected
         </div>
       </div>
 
+      {/* 久置筛选态：给一条可全选的入口，避免逐条勾 */}
+      {staleFilterOn && (
+        <div className="flex items-center justify-between gap-2 px-1 pb-1.5 shrink-0 anim-fade-in">
+          <span className="fs-2xs text-pink-500 font-medium">
+            只看悬置 {AGE_STALE_DAYS} 天以上的未完成任务
+          </span>
+          <button
+            onClick={() => onSelectAll(visibleRoots.map((t) => t.id))}
+            className="fs-2xs text-pink-600 hover:text-pink-700 font-semibold underline underline-offset-[3px] shrink-0"
+          >
+            全选 {visibleRoots.length} 项
+          </button>
+        </div>
+      )}
+
       {/* Task list */}
       <div
         data-list="tasks"
@@ -193,10 +245,10 @@ export default function TaskList({ onEdit, searchQuery, onSearchChange, selected
         onDragLeave={() => setDragOverRoot(false)}
         onDrop={handleRootDrop}
       >
-        {filteredRoots.map((task) => (
+        {visibleRoots.map((task) => (
           <TaskNode key={task.id} task={task} depth={0} allTasks={activeTasks} onEdit={onEdit} selectedIds={selectedIds} onToggleSelect={onToggleSelect} />
         ))}
-        {filteredRoots.length === 0 && searchQuery && (
+        {visibleRoots.length === 0 && searchQuery && (
           <p className="fs-xs text-violet-200 text-center py-8">没有找到匹配的任务</p>
         )}
       </div>

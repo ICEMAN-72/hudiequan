@@ -663,6 +663,50 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
 .dark .age-chip--aging { color: #C4B5FD; }
 .dark .age-chip--stale { color: #F472B6; }
 
+/* 久置筛选 chip —— 只在真有「14 天以上还没做完」的任务时才出现。
+   自带底色/边框：它压在 0.46 白的面板上，纯文字会糊成一片。
+   激活态用实心粉，和 age-chip--stale 同一套语义。 */
+.stale-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(244, 114, 182, 0.35);
+  background: rgba(253, 242, 248, 0.9);
+  color: #BE185D;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.stale-chip:hover {
+  background: rgba(252, 231, 243, 1);
+  border-color: rgba(236, 72, 153, 0.5);
+}
+.stale-chip--on {
+  background: #BE185D;
+  border-color: #BE185D;
+  color: #FFFFFF;
+}
+.stale-chip--on:hover {
+  background: #9D174D;
+  border-color: #9D174D;
+  color: #FFFFFF;
+}
+.dark .stale-chip {
+  background: rgba(190, 24, 93, 0.18);
+  border-color: rgba(244, 114, 182, 0.32);
+  color: #F9A8D4;
+}
+.dark .stale-chip:hover {
+  background: rgba(190, 24, 93, 0.3);
+  border-color: rgba(244, 114, 182, 0.5);
+}
+/* 三段：必须压过 .dark .stale-chip（两段）和 .stale-chip--on（一段） */
+.dark .stale-chip.stale-chip--on {
+  background: #F472B6;
+  border-color: #F472B6;
+  color: #4B1528;
+}
+
 /* 图标按钮 —— 统一按压反馈 */
 /* 次级操作 chip —— 必须自带边框/底色，否则 bg-violet-50 这种
    落在同样是淡紫的弹窗纸上会彻底隐形。 */

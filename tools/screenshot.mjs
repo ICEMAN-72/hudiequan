@@ -293,13 +293,7 @@ const tasks = [
   // 委托处理补充
   T({ id: 'c3', title: '让室友帮忙带快递', urgency: 'high', importance: 'low', createdAt: now - 12 * 3600000 }),
   // 尽量减少
-  T({
-    id: 'd1',
-    title: '刷完那部剧的第二季',
-    urgency: 'low',
-    importance: 'low',
-    createdAt: now - 8 * DAY,
-  }),
+  T({ id: 'd1', title: '刷完那部剧的第二季', urgency: 'low', importance: 'low', createdAt: now - 18 * DAY }),
   T({ id: 'd2', title: '整理多年没动的收藏夹', urgency: 'low', importance: 'low', createdAt: now - 20 * DAY }),
   T({ id: 'd3', title: '研究一下新的番茄钟 App', urgency: 'low', importance: 'low', createdAt: now - 5 * DAY }),
   // 周期任务：本期 + 往期
@@ -390,9 +384,17 @@ const clickByText = (text) =>
       return 'OK';
     })()
   `);
-/* 灵感浮窗没有遮罩（非模态），点 backdrop 关不掉，得点它自己的关闭按钮 */
-const closeModal = () =>
+/* 按 CSS 选择器点击 —— 用于文字/标题不稳定命中的控件（如带图标的 chip） */
+const clickSel = (sel) =>
   evalJs(`(() => {
+    const el = document.querySelector(${JSON.stringify(sel)});
+    if (!el) return 'MISS:${sel}';
+    el.click();
+    return 'OK';
+  })()`);
+
+/* 灵感浮窗没有遮罩（非模态），点 backdrop 关不掉，得点它自己的关闭按钮 */
+const closeModal = () =>  evalJs(`(() => {
     const bd = document.querySelector('.anim-backdrop-in');
     if (bd) { bd.click(); return 'backdrop'; }
     const btn = document.querySelector('.floating-window button[aria-label="关闭"]');
@@ -405,6 +407,25 @@ console.log('--- light ---');
 await reload(false);
 await sleep(500);
 await shot('01-main-light-zoom');
+
+// 久置筛选：chip → 只看陈年任务 → 全选 → BatchBar
+console.log(await clickSel('.stale-chip'));
+await sleep(450);
+await shot('14-stale-filter');
+console.log(
+  await evalJs(`(() => {
+    const b = [...document.querySelectorAll('button')].find(n => /^全选 \\d+ 项$/.test(n.textContent.trim()));
+    if (!b) return 'MISS:selectAll';
+    b.click();
+    return b.textContent.trim();
+  })()`)
+);
+await sleep(450);
+await shot('15-stale-selected');
+console.log(await clickByText('取消'));
+await sleep(300);
+console.log(await clickSel('.stale-chip'));
+await sleep(300);
 
 // 面板：设置
 console.log(await clickByText('设置'));
@@ -435,6 +456,14 @@ console.log('--- dark ---');
 await reload(true);
 await sleep(600);
 await shot('06-main-dark');
+
+// 深色下的久置 chip 激活态 —— .dark .stale-chip.stale-chip--on 是三段，
+// 段数不够会被 .dark .stale-chip 压掉（本项目在特异性上翻车过三次，必须留证据）
+console.log(await clickSel('.stale-chip'));
+await sleep(450);
+await shot('16-stale-filter-dark');
+console.log(await clickSel('.stale-chip'));
+await sleep(300);
 
 console.log(await clickByText('统计'));
 await sleep(900);
