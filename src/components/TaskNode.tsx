@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useTaskStore } from '../store/taskStore';
+import { useSettingsStore } from '../store/settingsStore';
+import { useToday } from '../hooks/useToday';
+import { ageInDays, ageTone, formatAge } from '../lib/date';
 import { getQuadrant, getEffectiveQuadrant, QUADRANT_CONFIG, formatDateRange } from '../types';
 import type { Task } from '../types';
 
@@ -96,6 +99,11 @@ export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, o
 
   const isSelected = selectedIds?.has(task.id) ?? false;
 
+  const showAge = useSettingsStore((s) => s.showAge);
+  const today = useToday();
+  const ageDays = ageInDays(task.createdAt, today);
+  const age = ageTone(ageDays);
+
   const children = allTasks.filter((t) => t.parentId === task.id && !t.isTrashed);
   const quadrant = task.parentId ? getEffectiveQuadrant(task, allTasks) : getQuadrant(task);
   const qConfig = QUADRANT_CONFIG[quadrant];
@@ -181,10 +189,17 @@ export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, o
           {task.title}
         </span>
 
-        {/* 创建时间：hover 才出现，平时不占视觉 */}
-        <span className="fs-2xs text-violet-300 tabular-nums shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-          {formatTime(task.createdAt)}
-        </span>
+        {/* 悬置天数 —— 接管原来 hover 才亮起的创建时间位：
+            同一份信息从「断续」变「常驻」，从噪点变信号，不多占一格宽度。
+            已完成/已删除不显示，那是历史，不必再催。 */}
+        {showAge && !isDone && !isTrash && age !== 'hidden' && (
+          <span
+            className={`age-chip fs-2xs age-chip--${age}`}
+            title={`创建于 ${formatTime(task.createdAt)} · 已悬置 ${ageDays} 天`}
+          >
+            {formatAge(ageDays)}
+          </span>
+        )}
 
         <DateBadge task={task} />
 

@@ -48,6 +48,45 @@ export function diffDays(a: string, b: string): number {
   return Math.round((parseDateStr(b).getTime() - parseDateStr(a).getTime()) / MS);
 }
 
+/* ───────────────────────── 悬置天数 ───────────────────────── */
+
+/**
+ * 任务在列表里躺了多少天（创建至今）。
+ *
+ * 用「日历天差」而不是 24 小时毫秒差：昨晚 23:59 建的任务，今早看应该是 1 天，
+ * 不是 0.02 天也不是 0 天。所以先各自落到本地日期串再相减。
+ *
+ * @param now 注入「今天」，仅供测试固定场景（理由同 nextOccurrence）。
+ */
+export function ageInDays(createdAt: number, now: string = todayStr()): number {
+  const created = toDateStr(new Date(createdAt));
+  return Math.max(0, diffDays(created, now));
+}
+
+/**
+ * 天数 → 显示分档。
+ * 刻意做成「渐进披露」：新任务不标数字，躺久了才逐级显形，
+ * 否则任务卡右侧会天天挂着一排「0天 0天 1天」，纯噪点。
+ */
+export type AgeTone = 'hidden' | 'fresh' | 'aging' | 'stale';
+
+export const AGE_STALE_DAYS = 14;
+export const AGE_AGING_DAYS = 7;
+export const AGE_FRESH_DAYS = 3;
+
+export function ageTone(days: number): AgeTone {
+  if (days >= AGE_STALE_DAYS) return 'stale';
+  if (days >= AGE_AGING_DAYS) return 'aging';
+  if (days >= AGE_FRESH_DAYS) return 'fresh';
+  return 'hidden';
+}
+
+/** 天数 → 紧凑文案。超过一个月换算成月，避免「97天」这种要心算的数字 */
+export function formatAge(days: number): string {
+  if (days >= 30) return `${Math.floor(days / 30)}个月`;
+  return `${days}天`;
+}
+
 /** 时间戳 → 'M/D HH:mm'（本地时区） */
 export function formatStamp(ts: number): string {
   const d = new Date(ts);

@@ -19,9 +19,10 @@ const SORT_LABELS: Record<SortOption, string> = {
   created: '按时间',
   children: '子任务数',
   category: '按类别',
+  age: '按悬置',
 };
 
-const SORT_OPTIONS: SortOption[] = ['default', 'status', 'created', 'children', 'category'];
+const SORT_OPTIONS: SortOption[] = ['default', 'status', 'created', 'age', 'children', 'category'];
 
 function sortRootTasks(tasks: Task[], sortBy: SortOption): Task[] {
   const roots = tasks.filter((t) => !t.parentId && !t.isTrashed && !isRecurringTask(t));
@@ -32,6 +33,16 @@ function sortRootTasks(tasks: Task[], sortBy: SortOption): Task[] {
     }
     case 'created':
       return [...roots].sort((a, b) => b.createdAt - a.createdAt);
+    case 'age': {
+      // 躺最久的浮上来 —— 这一档存在的意义就是「找出被你搁着不管的那个」。
+      // 已完成的沉底，别让做完的旧任务霸占版面。
+      return [...roots].sort((a, b) => {
+        const aDone = a.status === 'done' ? 1 : 0;
+        const bDone = b.status === 'done' ? 1 : 0;
+        if (aDone !== bDone) return aDone - bDone;
+        return a.createdAt - b.createdAt;
+      });
+    }
     case 'children': {
       const all = tasks.filter((t) => !t.isTrashed);
       return [...roots].sort((a, b) => all.filter((t) => t.parentId === b.id).length - all.filter((t) => t.parentId === a.id).length);

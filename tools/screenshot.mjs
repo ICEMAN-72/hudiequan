@@ -300,7 +300,7 @@ const tasks = [
     importance: 'low',
     createdAt: now - 8 * DAY,
   }),
-  T({ id: 'd2', title: '整理多年没动的收藏夹', urgency: 'low', importance: 'low', createdAt: now - 7 * DAY }),
+  T({ id: 'd2', title: '整理多年没动的收藏夹', urgency: 'low', importance: 'low', createdAt: now - 20 * DAY }),
   T({ id: 'd3', title: '研究一下新的番茄钟 App', urgency: 'low', importance: 'low', createdAt: now - 5 * DAY }),
   // 周期任务：本期 + 往期
   T({

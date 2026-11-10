@@ -647,6 +647,22 @@ body.dark { background: linear-gradient(135deg, #1a1625 0%, #1f1225 40%, #1a1418
   border-color: rgba(245, 158, 11, 0.5);
 }
 
+/* 悬置天数 —— 任务卡上最小的一块信号。
+   刻意只给字色，不给底色/边框：它是常驻显示的，任何「容器感」都会变成噪点。
+   三档都必须自带深色态，否则淡紫落在深紫底上会直接消失。 */
+.age-chip {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.age-chip--fresh { color: #8B7EDB; }
+.age-chip--aging { color: #6D28D9; font-weight: 600; }
+.age-chip--stale { color: #BE185D; font-weight: 600; }
+.dark .age-chip--fresh { color: #9A8FDC; }
+.dark .age-chip--aging { color: #C4B5FD; }
+.dark .age-chip--stale { color: #F472B6; }
+
 /* 图标按钮 —— 统一按压反馈 */
 /* 次级操作 chip —— 必须自带边框/底色，否则 bg-violet-50 这种
    落在同样是淡紫的弹窗纸上会彻底隐形。 */

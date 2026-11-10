@@ -1,3 +1,6 @@
+import { useSettingsStore } from '../store/settingsStore';
+import { useToday } from '../hooks/useToday';
+import { ageInDays, ageTone, formatAge } from '../lib/date';
 import type { Task } from '../types';
 import { STATUS_CONFIG, formatDateRange } from '../types';
 
@@ -13,6 +16,11 @@ export default function QuadrantTaskCard({ task, depth, onEdit, onCycleStatus }:
   const isDone = task.status === 'done';
   const hasDate = task.dateType && task.dateType !== 'none' && task.startDate;
   const indentPx = depth * 12;
+
+  const showAge = useSettingsStore((s) => s.showAge);
+  const today = useToday();
+  const ageDays = ageInDays(task.createdAt, today);
+  const age = ageTone(ageDays);
 
   const statusStyles: Record<Task['status'], React.CSSProperties> = {
     todo: { border: '1.5px solid #C4B5FD', background: 'transparent', boxShadow: 'none' },
@@ -48,6 +56,15 @@ export default function QuadrantTaskCard({ task, depth, onEdit, onCycleStatus }:
           {depth > 0 && <span className="text-violet-300 mr-1">↳</span>}
           {task.title}
         </span>
+
+        {showAge && !isDone && age !== 'hidden' && (
+          <span
+            className={`age-chip fs-2xs age-chip--${age}`}
+            title={`已悬置 ${ageDays} 天`}
+          >
+            {formatAge(ageDays)}
+          </span>
+        )}
 
         {hasDate && (
           <span className="w-2.5 h-2.5 rounded-full shrink-0"

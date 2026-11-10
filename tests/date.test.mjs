@@ -16,6 +16,9 @@ import {
   startOfWeekStr,
   nextOccurrence,
   diffDays,
+  ageInDays,
+  ageTone,
+  formatAge,
 } from '../src/lib/date.ts';
 
 /** 固定「今天」，让所有断言可重复 */
@@ -110,6 +113,41 @@ eq(nextOccurrence('monthly', '2026-12-05', NOW), '2027-01-01', '12 月的 monthl
 eq(nextOccurrence('daily', '2026-12-31', NOW), '2027-01-01', '跨年 daily');
 eq(diffDays('2026-10-19', '2026-10-26'), 7, '跨周相差 7 天');
 eq(diffDays('2026-12-31', '2027-01-01'), 1, '跨年相差 1 天');
+
+console.log('\n=== 10. 悬置天数 ===');
+{
+  // NOW = 2026-10-20。用本地时间构造时间戳，避免时区把日期推走。
+  const at = (y, m, d, hh = 10, mm = 0) => new Date(y, m - 1, d, hh, mm).getTime();
+
+  eq(ageInDays(at(2026, 10, 20), NOW), 0, '今天建的 = 0 天');
+  eq(ageInDays(at(2026, 10, 17), NOW), 3, '三天前 = 3 天');
+  eq(ageInDays(at(2026, 9, 20), NOW), 30, '一个月前 = 30 天');
+
+  // 毫秒差算法最容易翻车的地方：昨晚 23:59 到今早 00:01 只差 2 分钟，
+  // 但日历上跨了一天，用户认知里就是「1 天」。
+  eq(ageInDays(at(2026, 10, 19, 23, 59), NOW), 1, '昨晚 23:59 建的，今天算 1 天');
+  eq(ageInDays(at(2026, 10, 20, 0, 1), NOW), 0, '今天 00:01 建的，还是 0 天');
+
+  // 未来时间戳（改过系统时钟 / 同步进来的脏数据）不能算出负数
+  eq(ageInDays(at(2026, 10, 25), NOW), 0, '未来时间戳被夹到 0，不出负数');
+}
+
+console.log('\n=== 11. 悬置分档 ===');
+eq(ageTone(0), 'hidden', '0 天不显示');
+eq(ageTone(2), 'hidden', '2 天不显示');
+eq(ageTone(3), 'fresh', '3 天开始显形');
+eq(ageTone(6), 'fresh', '6 天仍是淡档');
+eq(ageTone(7), 'aging', '7 天加重');
+eq(ageTone(13), 'aging', '13 天仍是中档');
+eq(ageTone(14), 'stale', '14 天转警示');
+eq(ageTone(200), 'stale', '再久也不会跳档');
+
+console.log('\n=== 12. 悬置文案 ===');
+eq(formatAge(3), '3天', '个位数天数');
+eq(formatAge(23), '23天', '两位数天数');
+eq(formatAge(29), '29天', '29 天不进位');
+eq(formatAge(30), '1个月', '30 天转月');
+eq(formatAge(97), '3个月', '97 天 = 3 个月（向下取整）');
 
 console.log(`\n${'='.repeat(52)}`);
 console.log(`通过 ${pass} / ${pass + fail}`);

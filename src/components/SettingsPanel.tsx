@@ -34,6 +34,8 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
   const setFontSize = useSettingsStore((s) => s.setFontSize);
   const showCompleted = useSettingsStore((s) => s.showCompleted);
   const setShowCompleted = useSettingsStore((s) => s.setShowCompleted);
+  const showAge = useSettingsStore((s) => s.showAge);
+  const setShowAge = useSettingsStore((s) => s.setShowAge);
   const darkMode = useSettingsStore((s) => s.darkMode);
   const setDarkMode = useSettingsStore((s) => s.setDarkMode);
   const reviewEnabled = useSettingsStore((s) => s.reviewEnabled);
@@ -208,6 +210,14 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
               hint="列表和日历是否显示已完成；四象限只放未完成的"
               on={showCompleted}
               onToggle={() => setShowCompleted(!showCompleted)}
+            />
+          </div>
+          <div className="mt-2.5">
+            <ToggleRow
+              label="显示悬置天数"
+              hint="任务躺满 3 天才标出来，7 天转深紫，14 天转粉"
+              on={showAge}
+              onToggle={() => setShowAge(!showAge)}
             />
           </div>
         </Card>
