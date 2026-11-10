@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useTaskStore } from '../store/taskStore';
+import { useSettingsStore } from '../store/settingsStore';
+import { useToday } from '../hooks/useToday';
+import { nextOccurrence, ageInDays, ageTone, formatAge } from '../lib/date';
 import type { Task } from '../types';
 import { formatDateDisplay } from '../types';
-import { nextOccurrence } from '../lib/date';
 import TaskNode from './TaskNode';
 
 interface RecurringTasksPanelProps {
@@ -100,6 +102,13 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
   const children = openTask
     ? tasks.filter((c) => c.parentId === openTask.id && !c.isTrashed && c.status !== 'done')
     : [];
+
+  // 本期躺了多久。方块里不放（会被读成「每周20天」，且违反「方块只负责认得出」），
+  // 放在详情头部的元信息串里最自然。
+  const showAge = useSettingsStore((s) => s.showAge);
+  const today = useToday();
+  const openDays = openTask ? ageInDays(openTask.createdAt, today) : 0;
+  const openAge = ageTone(openDays);
 
   const closeDetail = () => {
     setOpenId(null);
@@ -275,6 +284,9 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
                   : openGroup.nextDate
                   ? ` · 下期 ${formatDateDisplay(openGroup.nextDate)}`
                   : ' · 等待下期'}
+                {showAge && openAge !== 'hidden' && (
+                  <span className={`age-chip fs-2xs age-chip--${openAge}`}> · 已悬置 {formatAge(openDays)}</span>
+                )}
                 {openGroup.history.length > 0 && ` · 往期 ${openGroup.history.length}`}
               </p>
             </div>
