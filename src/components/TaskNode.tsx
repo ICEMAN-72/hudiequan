@@ -63,14 +63,24 @@ function DateBadge({ task }: { task: Task }) {
   if (!task.dateType || task.dateType === 'none' || !task.startDate) return null;
   const text = formatDateRange(task);
   const isRange = task.dateType === 'range';
+  const color = isRange ? '#7C3AED' : '#EC4899';
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full fs-2xs font-medium shrink-0"
-      style={{ background: isRange ? 'rgba(124, 58, 237, 0.1)' : 'rgba(236, 72, 153, 0.1)', color: isRange ? '#7C3AED' : '#EC4899' }}>
-      <svg className="w-[0.7rem] h-[0.7rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-        <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" />
-      </svg>
-      {text}
-    </span>
+    <>
+      {/* 窄屏只留一个圆点：「11月9日 ~ 11月12日」这枚徽章要吃掉 120px，
+          375px 的屏幕上标题直接被挤成两个字。完整日期走 title。 */}
+      <span
+        className="md:hidden w-2 h-2 rounded-full shrink-0"
+        style={{ background: color, boxShadow: `0 0 4px ${isRange ? 'rgba(124,58,237,0.3)' : 'rgba(236,72,153,0.3)'}` }}
+        title={text}
+      />
+      <span className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full fs-2xs font-medium shrink-0"
+        style={{ background: isRange ? 'rgba(124, 58, 237, 0.1)' : 'rgba(236, 72, 153, 0.1)', color }}>
+        <svg className="w-[0.7rem] h-[0.7rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" />
+        </svg>
+        {text}
+      </span>
+    </>
   );
 }
 
@@ -150,17 +160,17 @@ export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, o
           style={{ background: qConfig.accent }}
         />
 
-        {/* Batch select checkbox */}
+        {/* Batch select checkbox —— 窄屏隐藏：手机上既没 hover 用不上，还白占 14px */}
         {onToggleSelect && !isTrash && (
           <button onClick={(e) => { e.stopPropagation(); onToggleSelect(task.id); }}
-            className={`w-[0.9rem] h-[0.9rem] rounded-[4px] border-2 shrink-0 transition-all duration-150 active:scale-90 ${isSelected ? 'bg-violet-500 border-violet-500' : 'border-violet-200 opacity-0 group-hover:opacity-100 hover:border-violet-400'}`}>
+            className={`hidden md:block w-[0.9rem] h-[0.9rem] rounded-[4px] border-2 shrink-0 transition-all duration-150 active:scale-90 ${isSelected ? 'bg-violet-500 border-violet-500' : 'border-violet-200 opacity-0 group-hover:opacity-100 hover:border-violet-400'}`}>
             {isSelected && <svg className="w-full h-full text-white p-[2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
           </button>
         )}
 
-        {/* Drag handle —— 静止时淡出，hover 才浮现 */}
+        {/* Drag handle —— 静止时淡出，hover 才浮现。窄屏隐藏：触屏上 HTML5 拖拽本身就不工作 */}
         {!isTrash && (
-          <svg className="w-[0.8rem] h-[0.8rem] text-violet-200 opacity-0 group-hover:opacity-100 shrink-0 transition-opacity" viewBox="0 0 24 24" fill="currentColor">
+          <svg className="hidden md:block w-[0.8rem] h-[0.8rem] text-violet-200 opacity-0 group-hover:opacity-100 shrink-0 transition-opacity" viewBox="0 0 24 24" fill="currentColor">
             <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
             <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
             <circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" />
@@ -184,8 +194,13 @@ export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, o
           </button>
         )}
 
-        {/* 标题 —— 单独一行，不再和创建时间抢宽度 */}
-        <span className={`flex-1 min-w-0 truncate fs-sm ${isDone || isTrash ? 'line-through text-violet-300' : 'text-violet-900'}`}>
+        {/* 标题 —— 单独一行，不再和创建时间抢宽度。
+            点标题进编辑：手机上根本没有 hover，操作按钮永远不出现，
+            不给这条路就等于手机上改不了任务。 */}
+        <span
+          onClick={isTrash ? undefined : () => onEdit(task.id)}
+          className={`flex-1 min-w-0 truncate fs-sm ${isTrash ? '' : 'cursor-pointer'} ${isDone || isTrash ? 'line-through text-violet-300' : 'text-violet-900'}`}
+        >
           {task.title}
         </span>
 
@@ -227,8 +242,9 @@ export default function TaskNode({ task, depth, allTasks, onEdit, selectedIds, o
           </span>
         )}
 
-        {/* Actions —— 常态隐藏，hover 展开；用负 margin 抵消宽度变化避免抖动 */}
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 -mr-1">
+        {/* Actions —— 常态隐藏，hover 展开；用负 margin 抵消宽度变化避免抖动。
+            窄屏整组隐藏：手机没有 hover，永远触发不了，却照样占着 60px 宽度。 */}
+        <div className="hidden md:flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 -mr-1">
           {isTrash ? (
             <>
               <button onClick={() => restoreTask(task.id)} className="icon-btn shrink-0 w-[1.2rem] h-[1.2rem] text-violet-300 hover:text-violet-600 hover:bg-violet-50/60 transition-colors icon-btn" title="恢复">

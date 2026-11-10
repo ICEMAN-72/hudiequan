@@ -129,14 +129,16 @@ function App() {
         noteCount={countActiveNotes(notes)}
       />
 
-      {/* 对半分：左右各占一半。左列上下等分给任务列表和周期任务，
-          右列四象限向下贯通两行 —— 四个象限格子因此变成正方形（460×476）。
-          日历不再常驻，走顶栏按钮呼出；灵感走浮窗。 */}
-      <div className="flex-1 flex gap-2.5 px-3 pb-3 pt-1 overflow-hidden relative z-10 min-h-0">
-        <div className="flex-1 min-w-0 flex flex-col gap-2.5">
-          {/* 左列 3:2，不是等比。周期任务通常只有个位数，等比会空掉一半；
+      {/* 宽屏：对半分。左列上下分给任务列表和周期任务，右列四象限贯通两行 ——
+          四个象限格子因此变成正方形（460×476）。
+          窄屏：单列纵向堆叠，每一块给固定视口高度、整区滚动。
+          不这么做的话 min-h-0 会把每块压成一条，且 375px 里并排两列必然崩。
+          pb-20 是给右下角那个常驻 FAB 让位，否则它会盖住最后一条任务。 */}
+      <div data-scroll="main" className="flex-1 flex flex-col md:flex-row gap-2 md:gap-2.5 px-2.5 md:px-3 pb-20 md:pb-3 pt-1 overflow-y-auto md:overflow-hidden relative z-10 min-h-0">
+        <div className="flex-none md:flex-1 min-w-0 flex flex-col gap-2 md:gap-2.5">
+          {/* 宽屏左列 3:2，不是等比。周期任务通常只有个位数，等比会空掉一半；
               而任务列表是每天盯得最久的地方，多给它 100px 就是多 3 条。 */}
-          <section className="tile flex-[1.5] min-h-0">
+          <section className="tile h-[62vh] md:h-auto md:flex-[1.5] shrink-0 md:shrink min-h-0">
             <TaskList
               onEdit={openEditDrawer}
               searchQuery={searchQuery}
@@ -147,12 +149,12 @@ function App() {
             />
           </section>
 
-          <section className="tile flex-1 min-h-0">
+          <section className="tile h-[42vh] md:h-auto md:flex-1 shrink-0 md:shrink min-h-0">
             <RecurringTasksPanel onEdit={openEditDrawer} onCreateRecurring={openRecurringDrawer} />
           </section>
         </div>
 
-        <section className="tile tile-major flex-1 min-w-0">
+        <section className="tile tile-major h-[82vh] md:h-auto md:flex-1 shrink-0 md:shrink min-w-0">
           <QuadrantView onEdit={openEditDrawer} />
         </section>
       </div>

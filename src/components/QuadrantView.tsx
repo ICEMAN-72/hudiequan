@@ -86,7 +86,9 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
         <span className="fs-2xs text-violet-300 tabular-nums">{totalCount} 项待办</span>
       </div>
 
-      <div className="flex-1 min-h-0 grid grid-cols-2 grid-rows-2 gap-2">
+      {/* 窄屏单列四行：375px 宽下就算保持 2×2，每格也只有 170px，
+          标题刚写完就到边了。宽屏仍是 2×2 的正方格。 */}
+      <div className="flex-1 min-h-0 grid grid-cols-1 grid-rows-4 md:grid-cols-2 md:grid-rows-2 gap-2">
         {LAYOUT.flat().map((q) => {
           const config = QUADRANT_CONFIG[q];
           const items = grouped[q];

@@ -658,6 +658,47 @@ const density = await evalJs(`(() => {
 console.log('--- 信息密度 ---');
 console.log(density);
 
+// ---------- 5. 手机视口 390×844 ----------
+// 窄屏是另一套布局（单列堆叠 + 四象限单列 + 顶栏收进「更多」），必须单独验。
+console.log('--- mobile 390x844 ---');
+await send('Emulation.setDeviceMetricsOverride', {
+  width: 390,
+  height: 844,
+  deviceScaleFactor: 2,
+  mobile: true,
+});
+await reload(false);
+await sleep(700);
+await shot('17-mobile-light');
+console.log(await clickSel('button[title="更多"]'));
+await sleep(400);
+await shot('18-mobile-more');
+// 点遮罩关掉下拉
+console.log(await clickSel('header .fixed.inset-0'));
+await sleep(300);
+await reload(true);
+await sleep(700);
+await shot('19-mobile-dark');
+
+// 窄屏四象限在页面下方（单列堆叠），必须滚到底才看得到
+console.log(
+  await evalJs(`(() => {
+    const el = document.querySelector('[data-scroll="main"]');
+    if (!el) return 'MISS:main-scroll';
+    el.scrollTo(0, el.scrollHeight);
+    return 'scrollHeight=' + el.scrollHeight;
+  })()`)
+);
+await sleep(450);
+await shot('20-mobile-quadrants');
+// 还原桌面视口，避免影响后续人工检查
+await send('Emulation.setDeviceMetricsOverride', {
+  width: 1680,
+  height: 1000,
+  deviceScaleFactor: 1,
+  mobile: false,
+});
+
 console.log('done');
 ws.close();
 server.close();

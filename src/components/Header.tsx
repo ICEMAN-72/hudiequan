@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 interface HeaderProps {
   totalTasks: number;
   doneTasks: number;
@@ -36,25 +38,39 @@ function ButterflyMark({ size = 30 }: { size?: number }) {
 }
 
 export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpClick, onStatsClick, onCabinetClick, onCloudClick, onCalendarClick, onNotesClick, noteCount }: HeaderProps) {
+  /** 窄屏下把次要入口收进「更多」——八个图标在 375px 上必然溢出 */
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  /** 更多菜单里的一项：图标 + 文字，只用图标在抽屉里认不出来 */
+  const moreItem = (label: string, onClick: () => void, icon: React.ReactNode) => (
+    <button
+      onClick={() => { setMoreOpen(false); onClick(); }}
+      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[10px] fs-xs font-medium text-violet-600 hover:bg-violet-50/70 active:bg-violet-50 transition-colors"
+    >
+      <span className="w-[1.05rem] h-[1.05rem] flex items-center justify-center shrink-0 text-violet-400">{icon}</span>
+      {label}
+    </button>
+  );
+
   return (
-    <header className="relative z-30 h-[4rem] px-6 flex items-center justify-between bg-white/60 backdrop-blur-xl border-b border-violet-50/40 shadow-warm shrink-0">
+    <header className="relative z-30 h-[4rem] px-4 md:px-6 flex items-center justify-between bg-white/60 backdrop-blur-xl border-b border-violet-50/40 shadow-warm shrink-0">
       {/* Logo + Title */}
-      <div className="flex items-center gap-3.5">
+      <div className="flex items-center gap-2.5 md:gap-3.5 min-w-0">
         <ButterflyMark size={32} />
-        <div className="flex items-baseline gap-2.5">
-          <h1 className="text-lg font-bold text-violet-900 tracking-tight">
+        <div className="flex items-baseline gap-2.5 min-w-0">
+          <h1 className="text-lg font-bold text-violet-900 tracking-tight shrink-0">
             蝴蝶泉
           </h1>
-          <span className="text-xs text-violet-300 tracking-wide">
+          <span className="hidden md:inline text-xs text-violet-300 tracking-wide">
             任务管理
           </span>
         </div>
       </div>
 
       {/* Right side: Stats + Settings */}
-      <div className="flex items-center gap-5">
-        {/* Stats */}
-        <div className="flex items-center gap-4 text-xs">
+      <div className="flex items-center gap-3 md:gap-5">
+        {/* Stats —— 窄屏收起，百分比算完也没地方看 */}
+        <div className="hidden md:flex items-center gap-4 text-xs">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-violet-200" />
             <span className="text-violet-500 font-medium tabular-nums">{totalTasks}</span>
@@ -76,7 +92,8 @@ export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpC
 
         {/* Cabinet + Cloud + Stats + Help + Settings */}
         <div className="flex items-center gap-1.5">
-          {/* 灵感：唯一带数字常驻的入口 —— 它是「怕忘」的东西，越不起眼越没用 */}
+          {/* 灵感：唯一带数字常驻的入口 —— 它是「怕忘」的东西，越不起眼越没用。
+              窄屏也保留：手机上随手记才是它最该出现的地方。 */}
           <button
             onClick={onNotesClick}
             className="note-chip h-[2.4rem] px-3 flex items-center gap-1.5 rounded-full transition-colors"
@@ -96,47 +113,78 @@ export default function Header({ totalTasks, doneTasks, onSettingsClick, onHelpC
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z" />
             </svg>
           </button>
-          <button
-            onClick={onCabinetClick}
-            className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
-            title="存储柜">
-            <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
-          </button>
-          <button
-            onClick={onCloudClick}
-            className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-teal-500 hover:text-teal-700 hover:bg-teal-50/60 transition-colors"
-            title="云端同步">
-            <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-          </button>
-          <button
-            onClick={onStatsClick}
-            className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
-            title="统计">
-            <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </button>
-          <button
-            onClick={onHelpClick}
-            className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
-            title="使用指南"
-          >
-            <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </button>
-          <button
-            onClick={onSettingsClick}
-            className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
-            title="设置"
-          >
-            <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </button>
+
+          {/* 宽屏：余下五个各占一个图标位 */}
+          <div className="hidden md:flex items-center gap-1.5">
+            <button
+              onClick={onCabinetClick}
+              className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
+              title="存储柜">
+              <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+            </button>
+            <button
+              onClick={onCloudClick}
+              className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-teal-500 hover:text-teal-700 hover:bg-teal-50/60 transition-colors"
+              title="云端同步">
+              <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </button>
+            <button
+              onClick={onStatsClick}
+              className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
+              title="统计">
+              <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </button>
+            <button
+              onClick={onHelpClick}
+              className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
+              title="使用指南"
+            >
+              <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+            <button
+              onClick={onSettingsClick}
+              className="w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full text-violet-400 hover:text-violet-600 hover:bg-violet-50/60 transition-colors"
+              title="设置"
+            >
+              <svg className="w-[1.1rem] h-[1.1rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </div>
+
+          {/* 窄屏：一个「更多」装下上面五个 */}
+          <div className="relative md:hidden">
+            <button
+              onClick={() => setMoreOpen((v) => !v)}
+              className={`w-[2.4rem] h-[2.4rem] flex items-center justify-center rounded-full transition-colors ${
+                moreOpen ? 'bg-violet-100/70 text-violet-700' : 'text-violet-400 hover:text-violet-600 hover:bg-violet-50/60'
+              }`}
+              title="更多"
+            >
+              <svg className="w-[1.15rem] h-[1.15rem]" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="5" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="12" cy="19" r="1.8" />
+              </svg>
+            </button>
+            {moreOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
+                <div className="absolute right-0 top-11 z-20 w-[9.5rem] p-1.5 rounded-[14px] surface-card shadow-warm-xl anim-scale-in">
+                  {moreItem('存储柜', onCabinetClick, <svg className="w-[0.9rem] h-[0.9rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>)}
+                  {moreItem('云端同步', onCloudClick, <svg className="w-[0.9rem] h-[0.9rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>)}
+                  {moreItem('统计', onStatsClick, <svg className="w-[0.9rem] h-[0.9rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>)}
+                  {moreItem('使用指南', onHelpClick, <svg className="w-[0.9rem] h-[0.9rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>)}
+                  {moreItem('设置', onSettingsClick, <svg className="w-[0.9rem] h-[0.9rem]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>)}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>
