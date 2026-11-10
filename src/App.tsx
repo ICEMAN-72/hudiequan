@@ -138,7 +138,7 @@ function App() {
         <div className="flex-none md:flex-1 min-w-0 flex flex-col gap-2 md:gap-2.5">
           {/* 宽屏左列 3:2，不是等比。周期任务通常只有个位数，等比会空掉一半；
               而任务列表是每天盯得最久的地方，多给它 100px 就是多 3 条。 */}
-          <section className="tile h-[62vh] md:h-auto md:flex-[1.5] shrink-0 md:shrink min-h-0">
+          <section className="tile tile--tasks h-[62vh] md:h-auto md:flex-[1.5] shrink-0 md:shrink min-h-0">
             <TaskList
               onEdit={openEditDrawer}
               searchQuery={searchQuery}

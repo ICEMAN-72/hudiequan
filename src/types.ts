@@ -116,6 +116,18 @@ export const STATUS_CONFIG: Record<
   },
 };
 
+/**
+ * 四象限配色 —— 颜色直接说出这个格子是什么性质，不是随手挑的四种颜色：
+ *
+ *   立即执行  火红   火已经烧起来了，现在不动就晚了
+ *   计划安排  靛蓝   蓝图、沉淀、长期，需要安静地想
+ *   委托处理  琥珀   交接给别人，带提醒/等待的意味
+ *   尽量减少  石板   退到背景里，不值得占用注意力
+ *
+ * 四色相拉开约 0°/36°/243°/215°（石板为低饱和），既能一眼分辨，
+ * 又不会像四个荧光块。具体底色在 index.css 的 .quad-tile--* 里，
+ * 不放这里：底色必须能写 .dark 覆盖，而工具类改不动无层级样式。
+ */
 export const QUADRANT_CONFIG: Record<
   Quadrant,
   {
@@ -123,61 +135,41 @@ export const QUADRANT_CONFIG: Record<
     subtitle: string;
     accent: string;
     accentLight: string;
-    bg: string;
-    border: string;
     text: string;
-    headerBg: string;
     headerText: string;
-    badge: string;
   }
 > = {
   do: {
     label: '立即执行',
     subtitle: '紧急 · 重要',
-    accent: '#EC4899',
-    accentLight: 'rgba(236, 72, 153, 0.12)',
-    bg: 'bg-pink-50/50',
-    border: 'border-pink-100/60',
-    text: 'text-pink-700',
-    headerBg: 'bg-pink-50/80',
-    headerText: 'text-pink-600',
-    badge: 'bg-pink-100/70 text-pink-600',
+    accent: '#DC2626',
+    accentLight: 'rgba(220, 38, 38, 0.14)',
+    text: 'text-red-700',
+    headerText: 'text-red-800',
   },
   schedule: {
     label: '计划安排',
     subtitle: '不紧急 · 重要',
-    accent: '#7C3AED',
-    accentLight: 'rgba(124, 58, 237, 0.12)',
-    bg: 'bg-violet-50/50',
-    border: 'border-violet-100/60',
-    text: 'text-violet-700',
-    headerBg: 'bg-violet-50/80',
-    headerText: 'text-violet-600',
-    badge: 'bg-violet-100/70 text-violet-600',
+    accent: '#4F46E5',
+    accentLight: 'rgba(79, 70, 229, 0.14)',
+    text: 'text-indigo-700',
+    headerText: 'text-indigo-800',
   },
   delegate: {
     label: '委托处理',
     subtitle: '紧急 · 不重要',
-    accent: '#FB923C',
-    accentLight: 'rgba(251, 146, 60, 0.12)',
-    bg: 'bg-orange-50/50',
-    border: 'border-orange-100/60',
-    text: 'text-orange-700',
-    headerBg: 'bg-orange-50/80',
-    headerText: 'text-orange-600',
-    badge: 'bg-orange-100/70 text-orange-600',
+    accent: '#D97706',
+    accentLight: 'rgba(217, 119, 6, 0.14)',
+    text: 'text-amber-700',
+    headerText: 'text-amber-800',
   },
   eliminate: {
     label: '尽量减少',
     subtitle: '不紧急 · 不重要',
-    accent: '#A8A4BE',
-    accentLight: 'rgba(168, 164, 190, 0.12)',
-    bg: 'bg-stone-50/50',
-    border: 'border-stone-200/60',
-    text: 'text-stone-600',
-    headerBg: 'bg-stone-50/80',
-    headerText: 'text-stone-500',
-    badge: 'bg-stone-100/70 text-stone-500',
+    accent: '#64748B',
+    accentLight: 'rgba(100, 116, 139, 0.14)',
+    text: 'text-slate-600',
+    headerText: 'text-slate-600',
   },
 };
 

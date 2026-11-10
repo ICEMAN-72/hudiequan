@@ -95,8 +95,7 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
 
           return (
             <div key={q}
-              className={`${config.bg} border-[1.5px] rounded-[14px] flex flex-col overflow-hidden min-h-0 dew-highlight shadow-warm`}
-              style={{ borderColor: `${config.accent}30` }}
+              className={`quad-tile quad-tile--${q} flex flex-col overflow-hidden min-h-0 dew-highlight shadow-warm`}
               onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
               onDrop={(e) => {
                 e.preventDefault(); e.stopPropagation();
@@ -105,7 +104,7 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
               }}>
               {/* 象限头部压成单行：标题 + 说明 + 数量。
                   原来是「标题行 + 说明行」，两行吃掉 63px，而每个格子总共才 200 出头 —— 光标题就占掉三成。 */}
-              <div className={`${config.headerBg} px-2 py-1 border-b ${config.border} shrink-0 flex items-baseline gap-1.5`}>
+              <div className={`quad-head quad-head--${q} px-2 py-1 shrink-0 flex items-baseline gap-1.5`}>
                 <h4 className={`fs-xs font-bold shrink-0 ${config.headerText}`}>{config.label}</h4>
                 <p className={`fs-2xs flex-1 truncate ${config.headerText} opacity-40`} title={config.subtitle}>{config.subtitle}</p>
                 {items.length > 0 && (

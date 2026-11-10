@@ -89,11 +89,11 @@ export default function ReviewModal({ onClose }: ReviewModalProps) {
       <div className="space-y-3">
         {/* 数字 */}
         <div className="grid grid-cols-2 gap-2.5">
-          <div className="rounded-[16px] px-4 py-3.5" style={{ background: 'linear-gradient(135deg, rgba(243,232,255,0.7) 0%, rgba(252,231,243,0.5) 100%)' }}>
+          <div className="review-stat rounded-[16px] px-4 py-3.5">
             <div className="fs-xl font-bold text-violet-700 tabular-nums leading-none">{finishedCount}</div>
             <div className="fs-2xs text-violet-400 mt-1.5">今天完成</div>
           </div>
-          <div className="rounded-[16px] px-4 py-3.5" style={{ background: 'linear-gradient(135deg, rgba(255,241,242,0.7) 0%, rgba(253,242,248,0.5) 100%)' }}>
+          <div className="review-stat review-stat--warn rounded-[16px] px-4 py-3.5">
             <div className="fs-xl font-bold text-pink-500 tabular-nums leading-none">{pendingCount}</div>
             <div className="fs-2xs text-pink-400 mt-1.5">还欠着</div>
           </div>
