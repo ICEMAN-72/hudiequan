@@ -21,7 +21,7 @@ import Modal from './components/ui/Modal';
 import { useNoteStore, countActiveNotes } from './store/noteStore';
 import { useDailyReview } from './hooks/useDailyReview';
 import { autoBackupOnLaunch } from './lib/autoBackup';
-import type { RecurrenceType } from './types';
+import type { RecurrenceType, Quadrant } from './types';
 import { isRecurringTask } from './types';
 
 function App() {
@@ -37,6 +37,8 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [recurringMode, setRecurringMode] = useState<RecurrenceType | undefined>(undefined);
+  /* 从象限表头点进来时预选的格子；从别处进来为 undefined（默认「立即执行」） */
+  const [newQuadrant, setNewQuadrant] = useState<Quadrant | undefined>(undefined);
 
   const fontSize = useSettingsStore((s) => s.fontSize);
   const darkMode = useSettingsStore((s) => s.darkMode);
@@ -78,16 +80,25 @@ function App() {
   const openEditDrawer = (id: string) => {
     setEditingTaskId(id);
     setRecurringMode(undefined);
+    setNewQuadrant(undefined);
     setShowNewTask(true);
   };
   const openRecurringDrawer = () => {
     setEditingTaskId(null);
     setRecurringMode('daily');
+    setNewQuadrant(undefined);
+    setShowNewTask(true);
+  };
+  const openQuadrantDrawer = (q: Quadrant) => {
+    setEditingTaskId(null);
+    setRecurringMode(undefined);
+    setNewQuadrant(q);
     setShowNewTask(true);
   };
   const closeDrawer = () => {
     setEditingTaskId(null);
     setRecurringMode(undefined);
+    setNewQuadrant(undefined);
     setShowNewTask(false);
   };
 
@@ -155,13 +166,13 @@ function App() {
         </div>
 
         <section className="tile tile-major h-[82vh] md:h-auto md:flex-1 shrink-0 md:shrink min-w-0">
-          <QuadrantView onEdit={openEditDrawer} />
+          <QuadrantView onEdit={openEditDrawer} onCreate={openQuadrantDrawer} />
         </section>
       </div>
 
       {/* 新建任务 —— 右下角常驻 */}
       <button
-        onClick={() => { setEditingTaskId(null); setRecurringMode(undefined); setShowNewTask(true); }}
+        onClick={() => { setEditingTaskId(null); setRecurringMode(undefined); setNewQuadrant(undefined); setShowNewTask(true); }}
         className="fixed bottom-5 right-5 z-30 w-13 h-13 rounded-full flex items-center justify-center text-white transition-transform duration-200 hover:scale-105 active:scale-95 anim-pop-in"
         style={{
           width: '3.25rem',
@@ -184,7 +195,7 @@ function App() {
             className="relative z-10 w-full"
             style={{ width: 'min(32rem, calc(100vw - 2.5rem))' }}
           >
-            <NewTaskForm editingTaskId={editingTaskId} onDone={closeDrawer} defaultRecurrence={recurringMode} />
+            <NewTaskForm editingTaskId={editingTaskId} onDone={closeDrawer} defaultRecurrence={recurringMode} defaultQuadrant={newQuadrant} />
           </div>
         </div>
       )}

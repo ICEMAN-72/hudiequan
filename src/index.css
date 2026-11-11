@@ -790,6 +790,21 @@ body.dark { background: linear-gradient(135deg, #1B1533 0%, #241332 40%, #221A1A
   border-bottom-color: rgba(100, 116, 139, 0.30);
 }
 
+/* 表头整条可点（直接在这一格里新建），hover 轻微加深当作「可按」的回应。
+   用 filter 而不是再叠一层背景：底色是渐变，改底色要写四份拷贝。 */
+.quad-head:hover {
+  filter: brightness(0.972) saturate(1.04);
+}
+
+/* 空态那一道横线。原先是 text-violet-200，铺在四张彩纸上基本看不见，
+   看起来像这一格渲染坏了。改中性半透明后哪种纸底上都读得出来。 */
+.quad-empty {
+  color: rgba(45, 43, 61, 0.26);
+}
+.dark .quad-empty {
+  color: rgba(224, 220, 240, 0.30);
+}
+
 /* 深色态：色相留着，明度压到磁贴同一档 —— 深色下最怕色块亮成灯箱 */
 .dark .quad-tile--do {
   background: linear-gradient(168deg, #43262E 0%, #332129 78%);

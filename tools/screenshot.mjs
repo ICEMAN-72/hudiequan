@@ -490,6 +490,17 @@ await shot('10-newtask');
 await closeModal();
 await sleep(400);
 
+// 点象限表头直接新建 —— 验证表单已经预选到「委托处理」，不用再点一次
+console.log('quad-head-create:', await clickSel('button[title="在「委托处理」里新建任务"]'));
+await sleep(1400);
+await shot('27-quadrant-create');
+console.log('quad-head-presel:', await evalJs(`(() => {
+  const on = document.querySelector('.quadrant-tile--on');
+  return on ? 'OK:' + on.textContent.trim().slice(0, 8) : 'MISS:preselect';
+})()`));
+await closeModal();
+await sleep(400);
+
 // 日历：日历已经不在主界面，要先点顶栏按钮呼出，再切日视图
 await reload(false);
 await sleep(600);

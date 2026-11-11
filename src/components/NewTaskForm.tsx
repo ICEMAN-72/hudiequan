@@ -7,6 +7,8 @@ interface NewTaskFormProps {
   editingTaskId: string | null;
   onDone: () => void;
   defaultRecurrence?: RecurrenceType;
+  /** 从某个象限表头点进来时，预选这一格 —— 用户已经用点击表明了意图 */
+  defaultQuadrant?: Quadrant;
 }
 
 const QUADRANT_VALUES: Record<Quadrant, { urgency: 'high' | 'low'; importance: 'high' | 'low' }> = {
@@ -48,7 +50,7 @@ const QUADRANT_ICONS: Record<Quadrant, string> = {
   eliminate: '🗑️',
 };
 
-export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }: NewTaskFormProps) {
+export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence, defaultQuadrant }: NewTaskFormProps) {
   const tasks = useTaskStore((s) => s.tasks);
   const addTask = useTaskStore((s) => s.addTask);
   const updateTask = useTaskStore((s) => s.updateTask);
@@ -83,14 +85,14 @@ export default function NewTaskForm({ editingTaskId, onDone, defaultRecurrence }
       setRecurrence(editingTask.recurrence ?? 'none');
     } else {
       setTitle('');
-      setSelectedQuadrant('do');
+      setSelectedQuadrant(defaultQuadrant ?? 'do');
       setDateType('none');
       setStartDate('');
       setEndDate('');
       setNotes('');
       setRecurrence(defaultRecurrence ?? 'none');
     }
-  }, [editingTask, defaultRecurrence]);
+  }, [editingTask, defaultRecurrence, defaultQuadrant]);
 
   const canSave = title.trim().length > 0;
 

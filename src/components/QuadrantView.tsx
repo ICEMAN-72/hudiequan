@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTaskStore } from '../store/taskStore';
 import type { Task, Quadrant } from '../types';
 import { getQuadrant, isRecurringTask, QUADRANT_CONFIG } from '../types';
@@ -5,6 +6,8 @@ import QuadrantTaskCard from './QuadrantTaskCard';
 
 interface QuadrantViewProps {
   onEdit: (id: string) => void;
+  /** 点象限表头直接在这一格里新建 —— 省掉「新建 → 再选一次象限」 */
+  onCreate?: (q: Quadrant) => void;
 }
 
 const LAYOUT: Quadrant[][] = [
@@ -29,10 +32,13 @@ function renderTree(task: Task, depth: number, allTasks: Task[], onEdit: (id: st
   return nodes;
 }
 
-export default function QuadrantView({ onEdit }: QuadrantViewProps) {
+export default function QuadrantView({ onEdit, onCreate }: QuadrantViewProps) {
   const tasks = useTaskStore((s) => s.tasks);
   const cycleStatus = useTaskStore((s) => s.cycleStatus);
   const updateTask = useTaskStore((s) => s.updateTask);
+  /* 拖拽时的目标格。以前拖过去什么都没有，只有松手才知道落进哪一格 ——
+     拖动全程是靠猜的。 */
+  const [overQuadrant, setOverQuadrant] = useState<Quadrant | null>(null);
 
   const QUADRANT_VALUES: Record<Quadrant, { urgency: Task['urgency']; importance: Task['importance'] }> = {
     do: { urgency: 'high', importance: 'high' },
@@ -96,21 +102,40 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
           return (
             <div key={q}
               className={`quad-tile quad-tile--${q} flex flex-col overflow-hidden min-h-0 dew-highlight shadow-warm`}
-              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              /* 拖到哪一格，哪一格就用它自己的色描边 —— 松手前就知道会落在哪。
+                 outline 不用 box-shadow：shadow-warm 在外层，两者互不覆盖。 */
+              style={overQuadrant === q ? { outline: `2px solid ${config.accent}`, outlineOffset: '-2px' } : undefined}
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); if (overQuadrant !== q) setOverQuadrant(q); }}
+              /* relatedTarget 还在格子里就不清 —— 不然经过子元素时会疯狂闪烁 */
+              onDragLeave={(e) => {
+                e.stopPropagation();
+                const to = e.relatedTarget as Node | null;
+                if (!to || !e.currentTarget.contains(to)) setOverQuadrant(null);
+              }}
               onDrop={(e) => {
                 e.preventDefault(); e.stopPropagation();
+                setOverQuadrant(null);
                 const taskId = e.dataTransfer.getData('task/id');
                 if (taskId) { const vals = QUADRANT_VALUES[q]; updateTask(taskId, vals); }
               }}>
               {/* 象限头部压成单行：标题 + 说明 + 数量。
-                  原来是「标题行 + 说明行」，两行吃掉 63px，而每个格子总共才 200 出头 —— 光标题就占掉三成。 */}
-              <div className={`quad-head quad-head--${q} px-2 py-1 shrink-0 flex items-baseline gap-1.5`}>
-                <h4 className={`fs-xs font-bold shrink-0 ${config.headerText}`}>{config.label}</h4>
-                <p className={`fs-2xs flex-1 truncate ${config.headerText} opacity-40`} title={config.subtitle}>{config.subtitle}</p>
+                  原来是「标题行 + 说明行」，两行吃掉 63px，而每个格子总共才 200 出头 —— 光标题就占掉三成。
+                  整条现在是个按钮：点一下就在这一格里新建，不用「新建 → 再选一次象限」。 */}
+              <button type="button"
+                onClick={() => onCreate?.(q)}
+                title={`在「${config.label}」里新建任务`}
+                className={`quad-head quad-head--${q} group/head w-full px-2 py-1 shrink-0 flex items-baseline gap-1.5 text-left cursor-pointer`}>
+                <span className={`fs-xs font-bold shrink-0 ${config.headerText}`}>{config.label}</span>
+                <span className={`fs-2xs flex-1 truncate text-left ${config.headerText} opacity-40`} title={config.subtitle}>{config.subtitle}</span>
                 {items.length > 0 && (
                   <span className={`fs-2xs font-bold shrink-0 ${config.headerText} opacity-50 tabular-nums`}>{items.length}</span>
                 )}
-              </div>
+                {/* 常驻但很淡，hover 变实：手机上没 hover，不能只在 hover 才给提示 */}
+                <svg className="w-[0.62rem] h-[0.62rem] shrink-0 opacity-35 group-hover/head:opacity-90 transition-opacity"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
 
               {/* 永远单列。
                   之前超过 14 条会切成两列，本意是多塞几条，实际效果是同一格里
@@ -118,7 +143,11 @@ export default function QuadrantView({ onEdit }: QuadrantViewProps) {
                   变成需要逐列读的表，比看不见更糟。宁可滚动。 */}
               <div className="p-1 flex-1 overflow-y-auto scroll-thin min-h-0">
                 {items.length === 0 ? (
-                  <div className="flex items-center justify-center h-full py-4"><span className="fs-2xs text-violet-200">—</span></div>
+                  /* 空态原来用 text-violet-200，铺在四张彩纸上基本看不见。
+                     改成中性半透明，哪种纸底上都读得出来。 */
+                  <div className="flex items-center justify-center h-full py-4">
+                    <span className="fs-2xs quad-empty" title="把任务拖到这一格">—</span>
+                  </div>
                 ) : (
                   items.map((task) => renderTree(task, 0, pendingTasks, onEdit, cycleStatus))
                 )}
