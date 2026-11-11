@@ -152,8 +152,11 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
       </div>
 
       {/* 方块网格 —— 一条横排卡片能放 1 项，做一个方块能放 1 项，
-          但方块可以横竖同时铺开，同样的面积多出一倍以上。 */}
-      <div className="flex-1 min-h-0 overflow-y-auto scroll-thin">
+          但方块可以横竖同时铺开，同样的面积多出一倍以上。
+          详情展开时整块让位（hidden）：面板只有 200 出头高，
+          塞下 7.2rem 的方块就剩不下详情的地儿，硬挤的结果是方块被压成一条
+          半截高的色带，比看不见更难看。想看别的就点 ✕ 收起再看。 */}
+      <div className={`flex-1 min-h-0 overflow-y-auto scroll-thin ${openGroup ? 'hidden' : ''}`}>
         {groups.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center gap-2">
             <svg className="w-8 h-8 text-teal-200 mb-1 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -256,9 +259,11 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
       </div>
 
       {/* 下方展开：子任务。方块只负责「认得出是哪一项」，
-          具体内容和子任务一律在这里展开，避免方块内部塞进两三层信息。 */}
+          具体内容和子任务一律在这里展开，避免方块内部塞进两三层信息。
+          max-h-[70%] 换成 flex-1：方块网格让位之后，剩余空间全部给它，
+          不用再猜百分比。 */}
       {openGroup && (
-        <div className="shrink-0 mt-2 flex flex-col rounded-[14px] surface-card border border-teal-100/60 anim-rise-in overflow-hidden">
+        <div className="flex-1 min-h-0 mt-2 flex flex-col rounded-[14px] surface-card border border-teal-100/60 anim-rise-in overflow-hidden">
           <div className="flex items-center gap-2 px-2.5 py-1.5 shrink-0 border-b border-teal-100/50">
             {openTask ? (
               <button
@@ -334,7 +339,10 @@ export default function RecurringTasksPanel({ onEdit, onCreateRecurring }: Recur
             </button>
           </div>
 
-          <div className="overflow-y-auto scroll-thin px-2.5 py-1.5 space-y-1.5 max-h-[13rem]">
+          {/* flex-1 min-h-0 而不是写死 max-h-[13rem]：
+              写死的高度不知道面板还剩多少，撑过界就被外层的 overflow:hidden 切掉。
+              交给 flex 分配，剩多少用多少，超出就在这里面滚。 */}
+          <div className="flex-1 min-h-0 overflow-y-auto scroll-thin px-2.5 py-1.5 space-y-1.5">
             {adding && openTask && (
               <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-[10px] bg-white border border-teal-200/70">
                 <div className="w-[0.85rem] h-[0.85rem] rounded-full border-2 border-teal-200 shrink-0" />

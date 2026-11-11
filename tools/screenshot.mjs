@@ -321,6 +321,18 @@ const tasks = [
     finishedAt: now - 24 * DAY,
     createdAt: now - 50 * DAY,
   }),
+  // 周期任务的子任务：归属地是周期任务面板，**不该出现在四象限**。
+  // 2026-11-11 的真实 bug —— 这几条曾被「父级不在集合里就提升为根」的兜底
+  // 捞进四象限，而且因为子任务继承模板的紧急/重要（高/高），全堆在立即执行。
+  T({ id: 'r1-s1', title: '早起空腹称重', urgency: 'high', importance: 'high', parentId: 'r1', createdAt: now - 2 * DAY }),
+  T({ id: 'r1-s2', title: '同步到表格', urgency: 'high', importance: 'high', parentId: 'r1', createdAt: now - 2 * DAY }),
+  // 故意堆到 6 条：子任务一多，详情区按内容撑开会顶出面板底边被切掉
+  T({ id: 'r1-s3', title: '算一遍体脂率', urgency: 'high', importance: 'high', parentId: 'r1', createdAt: now - 2 * DAY }),
+  T({ id: 'r1-s4', title: '对比上月趋势', urgency: 'high', importance: 'high', parentId: 'r1', createdAt: now - 2 * DAY }),
+  T({ id: 'r1-s5', title: '低于目标就减一顿夜宵', urgency: 'high', importance: 'high', parentId: 'r1', createdAt: now - 2 * DAY }),
+  T({ id: 'r1-s6', title: '记下异常原因（熬夜/聚餐）', urgency: 'high', importance: 'high', parentId: 'r1', createdAt: now - 2 * DAY }),
+  // 往期已完成实例的子任务：父级是 done，但父级本身是周期任务，同样不进象限
+  T({ id: 'r1p-s1', title: '补记上月体重', urgency: 'high', importance: 'high', parentId: 'r1-prev', createdAt: now - 24 * DAY }),
   // 统计用的近期完成
   ...Array.from({ length: 9 }).map((_, i) =>
     T({
@@ -407,6 +419,14 @@ console.log('--- light ---');
 await reload(false);
 await sleep(500);
 await shot('01-main-light-zoom');
+
+// 回归点：周期任务的子任务不能漏进四象限（2026-11-11 修的那个 bug）
+console.log('quad-no-recurring-child:', await evalJs(`(() => {
+  const tiles = [...document.querySelectorAll('.quad-tile')];
+  const txt = tiles.map(n => n.textContent || '').join('|');
+  const leaked = ['空腹称重', '同步到表格', '补记上月体重'].filter(s => txt.includes(s));
+  return leaked.length ? 'LEAK:' + leaked.join(',') : 'OK';
+})()`));
 
 // 久置筛选：chip → 只看陈年任务 → 全选 → BatchBar
 console.log(await clickSel('.stale-chip'));
@@ -500,6 +520,33 @@ console.log('quad-head-presel:', await evalJs(`(() => {
 })()`));
 await closeModal();
 await sleep(400);
+
+// 周期任务的子任务现在只住在这里 —— 点开「记录体重与体脂」应该看到两条子任务
+console.log('open-rec-tile:', await evalJs(`(() => {
+  const tile = [...document.querySelectorAll('.rec-tile')].find(n => (n.textContent || '').includes('记录体重'));
+  if (!tile) return 'MISS:rec-tile';
+  tile.click();
+  return 'OK';
+})()`));
+await sleep(700);
+await shot('28-recurring-children');
+console.log('rec-children:', await evalJs(`(() => {
+  const txt = document.body.textContent || '';
+  const want = ['空腹称重', '同步到表格'];
+  const miss = want.filter(s => !txt.includes(s));
+  return miss.length ? 'MISS:' + miss.join(',') : 'OK';
+})()`));
+// 详情区不能顶出面板底边（.tile 是 overflow:hidden，超了就是硬切）
+console.log('rec-detail-fit:', await evalJs(`(() => {
+  const root = document.querySelector('.rec-tile')?.closest('.h-full.flex.flex-col');
+  const detail = root?.querySelector('.surface-card');
+  if (!root || !detail) return 'MISS:box';
+  const r = root.getBoundingClientRect(), d = detail.getBoundingClientRect();
+  const over = Math.round(d.bottom - r.bottom);
+  return over <= 1 ? 'OK' : 'OVERFLOW:' + over + 'px';
+})()`));
+await reload(false);
+await sleep(500);
 
 // 日历：日历已经不在主界面，要先点顶栏按钮呼出，再切日视图
 await reload(false);

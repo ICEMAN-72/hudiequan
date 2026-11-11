@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTaskStore } from '../store/taskStore';
 import type { Task, Quadrant } from '../types';
-import { getQuadrant, isRecurringTask, QUADRANT_CONFIG } from '../types';
+import { QUADRANT_CONFIG } from '../types';
+import { buildQuadrantGroups, collectPending } from '../lib/quadrant';
 import QuadrantTaskCard from './QuadrantTaskCard';
 
 interface QuadrantViewProps {
@@ -50,32 +51,14 @@ export default function QuadrantView({ onEdit, onCreate }: QuadrantViewProps) {
   /* 四象限是「待办视图」：做完的事一律离场。
      以前这里跟着「显示已完成」开关走，开关一开，完成的任务就留在格子里，
      越做越满，真正还没做的反而被挤到看不见。
-     离开这里不等于任务消失 —— 任务列表和存储柜照样能看到。 */
-  const pendingTasks = tasks.filter((t) => !t.isTrashed && !isRecurringTask(t) && t.status !== 'done');
-  const pendingIds = new Set(pendingTasks.map((t) => t.id));
+     离开这里不等于任务消失 —— 任务列表和存储柜照样能看到。
 
-  /* 父任务已完成、子任务还开着，这个状态是真实存在的 ——
-     完成父任务不会级联子任务。这种子任务如果还按 parentId 归组，
-     就会因为父级不在列表里而凭空消失，所以把它提升成根、单独成条。 */
-  const isRootOf = (t: Task) => !t.parentId || !pendingIds.has(t.parentId);
+     归组逻辑抽到 lib/quadrant.ts：周期任务的子任务（含往期克隆出来的）
+     以前被「父级不在集合里就提升为根」的兜底捞了进来，全堆在立即执行。 */
+  const pendingTasks = useMemo(() => collectPending(tasks), [tasks]);
+  const grouped = useMemo(() => buildQuadrantGroups(tasks), [tasks]);
 
-  const grouped: Record<Quadrant, Task[]> = {
-    do: [], schedule: [], delegate: [], eliminate: [],
-  };
-  const order: Record<Task['status'], number> = { in_progress: 0, todo: 1, done: 2 };
-
-  for (const task of pendingTasks) {
-    if (isRootOf(task)) grouped[getQuadrant(task)].push(task);
-  }
-
-  (Object.keys(grouped) as Quadrant[]).forEach((q) => {
-    grouped[q].sort((a, b) => {
-      if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
-      return b.createdAt - a.createdAt;
-    });
-  });
-
-  const totalCount = pendingTasks.filter(isRootOf).length;
+  const totalCount = (Object.keys(grouped) as Quadrant[]).reduce((n, q) => n + grouped[q].length, 0);
 
   /* 四格等分，不再按内容量伸缩。
      上一版用 sqrt 权重让格子随任务数长大，结果四格比例不匀，
